@@ -1,0 +1,82 @@
+@import "tailwindcss";
+@import "./tokens.css";
+@import "./typography.css";
+
+/*
+ * Tailwind theme, mapped onto the Figma tokens.
+ * The default Tailwind palette is switched off on purpose: `text-red-500`
+ * does not exist in this repo. Use a semantic class or add a token in Figma.
+ */
+@theme {
+  --color-*: initial;
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-label: "Plus Jakarta Sans", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme inline {
+  /* surfaces */
+  --color-page: var(--surface-page);
+  --color-raised: var(--surface-raised);
+  --color-sunken: var(--surface-sunken);
+  --color-inset: var(--surface-inset);
+  --color-inverse: var(--surface-inverse);
+  /* borders */
+  --color-hairline: var(--border-hairline);
+  --color-strong: var(--border-strong);
+  --color-focus: var(--border-focus);
+  /* text */
+  --color-ink: var(--text-primary);
+  --color-ink-2: var(--text-secondary);
+  --color-muted: var(--text-muted);
+  --color-on-action: var(--text-on-action);
+  --color-on-inverse: var(--text-inverse);
+  /* actions */
+  --color-action: var(--action-primary);
+  --color-action-hover: var(--action-primary-hover);
+  --color-action-2: var(--action-secondary);
+  --color-disabled: var(--action-disabled);
+  /* status: surface, ink, accent */
+  --color-success: var(--status-success-surface);
+  --color-success-ink: var(--status-success-ink);
+  --color-success-accent: var(--status-success-accent);
+  --color-warning: var(--status-warning-surface);
+  --color-warning-ink: var(--status-warning-ink);
+  --color-warning-accent: var(--status-warning-accent);
+  --color-danger: var(--status-error-surface);
+  --color-danger-ink: var(--status-error-ink);
+  --color-danger-accent: var(--status-error-accent);
+  --color-info: var(--status-info-surface);
+  --color-info-ink: var(--status-info-ink);
+  --color-info-accent: var(--status-info-accent);
+  --color-pending: var(--status-pending-surface);
+  --color-pending-ink: var(--status-pending-ink);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* radius */
+  --radius-control: var(--button-radius);
+  --radius-card: var(--card-radius);
+  --radius-chip: var(--chip-radius);
+  --radius-tile: var(--icon-tile-radius);
+  --radius-modal: var(--modal-radius);
+
+  /* elevation */
+  --shadow-raised: var(--effect-elevation-raised);
+  --shadow-popover: var(--effect-elevation-popover);
+  --shadow-overlay: var(--effect-elevation-overlay);
+  --shadow-focus: var(--effect-focus-ring);
+
+  /* layout widths */
+  --container-app: var(--layout-container-app);
+  --container-report: var(--layout-container-report);
+}
+
+@layer base {
+  html { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  body { background: var(--surface-page); color: var(--text-primary); }
+  :focus-visible { outline: none; box-shadow: var(--effect-focus-ring); }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
