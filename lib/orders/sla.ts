@@ -117,3 +117,10 @@ export const formatTime = (d: Date) => format(zoned(d), "HH:mm");
 export const formatDay = (d: Date) => format(zoned(d), "EEE HH:mm");
 export const formatPrice = (cents: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
+
+/** "6h 12m", "45m". Wall-clock time from payment to delivery, as S-13 shows it. */
+export function formatDuration(from: Date, to: Date): string {
+  const mins = Math.max(0, Math.round((to.getTime() - from.getTime()) / MIN));
+  const h = Math.floor(mins / 60);
+  return h ? `${h}h ${mins % 60}m` : `${mins}m`;
+}

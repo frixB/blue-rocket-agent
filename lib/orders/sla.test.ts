@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { TZDate } from "@date-fns/tz";
 import {
   SLA, addBusinessMinutes, businessMinutesBetween, deliveryDeadline,
-  formatDeliveryPromise, queueReason, slaState,
+  formatDeliveryPromise, formatDuration, queueReason, slaState,
 } from "./sla";
 
 // September 2026: Tue 15, Wed 16, Thu 17, Fri 18, Sat 19, Sun 20, Mon 21.
@@ -49,4 +49,9 @@ describe("business minutes", () => {
 describe("formatDeliveryPromise", () => {
   it("says tomorrow for next day", () => expect(formatDeliveryPromise(t(16, 15), t(15, 15))).toBe("by 3:00pm tomorrow"));
   it("names the day for a weekend order", () => expect(formatDeliveryPromise(t(21, 17), t(18, 18))).toBe("by 5:00pm Monday 21 Sep"));
+});
+
+describe("formatDuration", () => {
+  it("formats hours and minutes", () => expect(formatDuration(t(15, 9, 14), t(15, 15, 26))).toBe("6h 12m"));
+  it("drops the hours under one hour", () => expect(formatDuration(t(15, 9), t(15, 9, 45))).toBe("45m"));
 });
