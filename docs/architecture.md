@@ -1,13 +1,15 @@
 # Blue Rocket Agents — Architecture
 
-**Version:** 1.0
-**Last updated:** 16 September 2026
+**Version:** 1.1
+**Last updated:** 23 September 2026
 **Owners:** frixB (build) · Carlos (sales, product)
 **Stack:** Next.js 16 App Router · React 19 · TypeScript · Tailwind CSS v4 · Postgres · Stripe
 
 ---
 
 > **Repo note, 22 Sep 2026.** The code in this repo is the source of truth where it differs from the examples below. In particular: token CSS names come from `design-tokens/build.mjs` (see `styles/tokens.css`), Tailwind class names are defined in `styles/globals.css`, the default Tailwind palette is switched off, and user-facing copy lives in the state components and is reviewed in the PR diff. Figma's Variables REST API is Enterprise-only, see `design-tokens/README.md` for the MCP route.
+>
+> **Repo note, 23 Sep 2026.** §4.3 to §5 now describe the code as built: the token-to-utility map, the lint rules, every primitive with its Figma layer and node id, the `/dev/components` gallery, and how to read a Figma screen with the MCP connector. The rest of the document is still the plan; where the repo tree in §3 and the code disagree, the code wins.
 
 ## 0. What this document is
 
@@ -92,28 +94,22 @@ blue-rocket/
 │  └─ layout.tsx
 │
 ├─ components/
-│  ├─ ui/                                # primitives — the only place styling lives
-│  │  ├─ button.tsx
-│  │  ├─ input.tsx
-│  │  ├─ select.tsx
-│  │  ├─ card.tsx
-│  │  ├─ chip.tsx
-│  │  ├─ status-badge.tsx
-│  │  ├─ icon-tile.tsx
-│  │  ├─ modal.tsx
-│  │  ├─ progress-bar.tsx
-│  │  ├─ summary-row.tsx
+│  ├─ ui/                                # primitives — the only place styling lives, see §5.2
+│  │  ├─ avatar.tsx       banner.tsx       button.tsx
+│  │  ├─ card.tsx         checkbox.tsx     chip.tsx
+│  │  ├─ code-block.tsx   empty-state.tsx  field.tsx
+│  │  ├─ heading.tsx      icon.tsx         icon-tile.tsx
+│  │  ├─ input.tsx        modal.tsx        note.tsx
+│  │  ├─ progress-bar.tsx select.tsx       stat.tsx
+│  │  ├─ status-badge.tsx summary-row.tsx  tabs.tsx
 │  │  ├─ timeline-step.tsx
-│  │  ├─ empty-state.tsx
-│  │  ├─ note.tsx                        # the tinted reassurance strip
-│  │  └─ stat.tsx
-│  ├─ blocks/                            # composed, still presentational
-│  │  ├─ order-summary-card.tsx
-│  │  ├─ progress-rail.tsx
-│  │  ├─ delivery-promise.tsx            # C-13, computes and renders the date
-│  │  ├─ report-section-card.tsx
-│  │  ├─ finding-row.tsx
-│  │  └─ app-nav.tsx
+│  │  └─ index.ts                        # the only import path: "@/components/ui"
+│  ├─ blocks/                            # composed, still presentational, see §5.3
+│  │  ├─ app-nav.tsx  status-layout.tsx  order-summary-card.tsx
+│  │  ├─ progress-rail.tsx  delivery-promise.tsx  finding-row.tsx
+│  │  ├─ report-sections.ts               # the four sections: names, icons, contents
+│  │  ├─ marketing-section.tsx  landing.tsx
+│  │  └─ status-poller.tsx
 │  └─ states/                            # one file per order state, see §6
 │     ├─ running.tsx      queued.tsx      weekend-queued.tsx
 │     ├─ blocked.tsx      partial.tsx     late.tsx
@@ -131,7 +127,7 @@ blue-rocket/
 │
 ├─ design-tokens/
 │  ├─ tokens.json                        # exported from Figma, committed
-│  ├─ build.ts                           # tokens.json -> tokens.css
+│  ├─ build.mjs                          # tokens.json -> tokens.css + typography.css
 │  └─ README.md
 │
 ├─ styles/
@@ -170,197 +166,160 @@ Four collections now exist in the Figma file, in dependency order:
 | `3. Scale` | `space/*`, `radius/*`, `size/*`, `border-width/*`, `font-size/*`, `line-height/*`, `layout/*` | Value | Yes |
 | `4. Component` | `button/*`, `input/*`, `card/*`, `chip/*`, `modal/*`, `nav/*`, `rail/*` — aliases to Scale and Semantic | Value | Yes |
 
-Plus four effect styles (`elevation/raised`, `elevation/popover`, `elevation/overlay`, `focus/ring`) and fifteen text styles (`display` through `overline`).
+Plus four effect styles (`elevation/raised`, `elevation/popover`, `elevation/overlay`, `focus/ring`) and 23 text styles: eight `BRA/*` brand styles (Instrument Serif headings, Plus Jakarta Sans labels, Inter body) and fifteen Inter UI styles (`display` through `overline`).
+
+Two older unnumbered collections, `Space` and `Radius`, are still in the file. The build emits them as `--legacy-*` and warns. Nothing uses them; they can be deleted in Figma.
 
 The two-mode Semantic collection is what encodes the product's core visual rule: **dark is where you sell, light is where the customer works.** The marketing layout sets `data-theme="marketing"`, the portal layout sets `data-theme="app"`, and no component needs to know which it is in.
 
 ### 4.2 Export
 
 ```bash
-pnpm tokens:pull      # Figma REST /v1/files/:key/variables/local -> design-tokens/tokens.json
-pnpm tokens:build     # tokens.json -> styles/tokens.css
+npm run tokens:pull   # Figma REST /v1/files/:key/variables/local -> design-tokens/tokens.json (Enterprise only)
+npm run tokens:build  # tokens.json -> styles/tokens.css + styles/typography.css
 ```
 
 `tokens.json` is committed. This matters: it means a token change shows up as a reviewable diff in a PR, and CI can fail a build where a token was removed but is still referenced.
 
-### 4.3 Output: `styles/tokens.css`
+### 4.3 Output: `styles/tokens.css` and `styles/typography.css`
+
+Both files are generated by `design-tokens/build.mjs` and never edited by hand. Token names are the Figma variable path, slugged: `2. Semantic / surface/page` becomes `--surface-page`, `4. Component / input/border` becomes `--input-border`.
 
 ```css
-/* GENERATED FILE — do not edit. Run `pnpm tokens:build`. */
-:root {
-  /* scale — mode independent */
-  --space-1: 8px;   --space-2: 16px;  --space-3: 24px;  --space-4: 32px;
-  --space-5: 40px;  --space-7: 56px;  --space-9: 80px;
-  --radius-md: 10px; --radius-lg: 12px; --radius-2xl: 16px; --radius-full: 999px;
-  --font-size-body: 15px; --font-size-h1: 34px; --font-size-display: 40px;
-  --line-height-snug: 1.25; --line-height-normal: 1.5;
-  --layout-container-app: 1100px; --layout-column-main: 760px; --layout-column-rail: 340px;
-
-  /* semantic — App (light) is the default mode */
-  --surface-page: #F5F7FA;
-  --surface-raised: #FFFFFF;
-  --surface-sunken: #FBFCFD;
-  --surface-inset: #EEF1F6;
-  --surface-inverse: #0B1120;
-  --border-hairline: #E5E9F0;
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-muted: #94A3B8;
-  --text-on-action: #1F2937;
-  --action-primary: #F5A524;
-  --status-success-surface: #DCFCE7; --status-success-ink: #166534;
-  --status-warning-surface: #FEF3C7; --status-warning-ink: #92400E;
-  --status-error-surface:   #FEE2E2; --status-error-ink:   #991B1B;
-  --status-info-surface:    #DBEAFE; --status-info-ink:    #1E3A8A;
-
-  /* component */
-  --button-padding-x: var(--space-25);
+/* styles/tokens.css (excerpt) */
+:root, [data-theme="app"] {
+  --space-05: 4px;  --space-2: 16px;  --space-35: 28px;
+  --radius-md: 10px; --radius-2xl: 16px; --radius-full: 999px;
+  --surface-page: var(--colour-neutral-100);      /* #F5F7FA */
+  --action-primary: var(--colour-blue-500);       /* #2563EB */
+  --border-focus: var(--colour-blue-500);
   --card-padding: var(--space-35);
-  --modal-radius: var(--radius-4xl);
-
-  /* effects */
-  --elevation-overlay: 0 18px 44px rgba(0,0,0,.20);
-  --focus-ring: 0 0 0 3px rgba(245,165,36,.45);
+  --input-border: var(--border-strong);
 }
-
 [data-theme="marketing"] {
-  --surface-page: #070C17;
-  --surface-raised: #131C2E;
-  --surface-inset: #1A2434;
-  --border-hairline: #1E293B;
-  --text-primary: #F8FAFC;
-  --text-secondary: #CBD5E1;
+  --surface-page: var(--colour-neutral-1050);     /* #070C17 */
+  --text-primary: var(--colour-neutral-50);
 }
 ```
 
-### 4.4 Tailwind v4
+Text styles become Tailwind utilities in `typography.css`: `type-bra-display`, `type-bra-heading-1…3` (Instrument Serif), `type-bra-label` and `type-bra-caption` (Plus Jakarta Sans), and the Inter scale `type-display-lg` through `type-overline`. All three families are loaded in `app/layout.tsx` through `@fontsource`; the build warns if a text style uses a family that layout does not import.
 
-Tailwind v4 is configured in CSS, not in a JS config. There is no `tailwind.config.js`.
+In the Figma MCP output these same variables appear as `--bra-surface-page`, `--bra-action-primary` and so on. That `bra-` prefix is only Figma's code syntax. The values are identical.
 
-```css
-/* styles/globals.css */
-@import "tailwindcss";
-@import "./tokens.css";
+### 4.4 Tailwind v4: tokens become utilities
 
-@theme inline {
-  --color-surface:        var(--surface-page);
-  --color-raised:         var(--surface-raised);
-  --color-sunken:         var(--surface-sunken);
-  --color-inset:          var(--surface-inset);
-  --color-inverse:        var(--surface-inverse);
-  --color-hairline:       var(--border-hairline);
-  --color-ink:            var(--text-primary);
-  --color-ink-2:          var(--text-secondary);
-  --color-muted:          var(--text-muted);
-  --color-action:         var(--action-primary);
-  --color-on-action:      var(--text-on-action);
-  --color-success:        var(--status-success-surface);
-  --color-success-ink:    var(--status-success-ink);
-  --color-warning:        var(--status-warning-surface);
-  --color-warning-ink:    var(--status-warning-ink);
-  --color-danger:         var(--status-error-surface);
-  --color-danger-ink:     var(--status-error-ink);
+Tailwind is configured in CSS (`styles/globals.css`), not a JS config. The default palette is switched off (`--color-*: initial`), so the only colours that exist are token colours. Every scale and component token a component needs has a named utility:
 
-  --radius-card:   var(--radius-2xl);
-  --radius-control: var(--radius-md);
-  --shadow-overlay: var(--elevation-overlay);
-}
-```
+| Utility | Token | Figma variable |
+|---|---|---|
+| `bg-page` `bg-raised` `bg-sunken` `bg-inset` `bg-inverse` | `--surface-*` | `2. Semantic / surface/*` |
+| `text-ink` `text-ink-2` `text-muted` `text-on-action` | `--text-*` | `text/*` |
+| `bg-action` `hover:bg-action-hover` `bg-action-2` | `--action-*` | `action/*` |
+| `bg-success` `text-success-ink` `text-success-accent` (and warning, danger, info, pending) | `--status-*` | `status/*` |
+| `border-hairline` `border-strong` | `--border-*` | `border/*` |
+| `bg-input` `border-input-border` `bg-input-error` `border-input-valid-border` … | `--input-*` | `4. Component / input/*` |
+| `p-4`, `gap-2.5`, every numeric step | `--spacing: var(--space-05)` (4px) | `3. Scale / space/05` |
+| `p-card` `p-card-compact` `gap-card-gap` | `--card-*` | `card/*` |
+| `px-chip-x` `py-chip-y` | `--chip-*` | `chip/*` |
+| `px-button-x` `gap-button-gap` | `--button-*` | `button/*` |
+| `h-control-sm/md/lg/xl` `h-input` | `--size-control-*`, `--input-height` | `size/control/*` |
+| `size-tile-sm … size-tile-5xl` `size-avatar` | `--size-icon-*`, `--size-avatar` | `size/icon/*` |
+| `p-modal` `gap-modal-gap` `rounded-modal` | `--modal-*` | `modal/*` |
+| `px-nav-x` `py-nav-y` `pt-page-top` `pb-page-bottom` `gap-section` | `--nav-*`, `--page-*` | `nav/*`, `page/*` |
+| `size-rail-marker` `h-rail-connector` `gap-rail-gap` | `--rail-*` | `rail/*` |
+| `h-bar` | `--border-width-bar` | `border-width/bar` |
+| `rounded-control` `rounded-input` `rounded-card` `rounded-chip` `rounded-tile` | component radii | `button/radius` … |
+| `rounded-xs … rounded-full` | `--radius-*` | `3. Scale / radius/*` |
+| `max-w-app` `max-w-report` `max-w-main` `max-w-wide` `max-w-rail` `max-w-modal-sm…xl` | `--layout-*` | `layout/*` |
+| `shadow-raised` `shadow-popover` `shadow-overlay` `shadow-focus` | effect styles | `elevation/*`, `focus/ring` |
 
-So a component writes `bg-raised border-hairline text-ink rounded-card`, and the same markup renders light in the portal and dark on the landing page. No `dark:` variants anywhere, and no theme prop threaded through components.
+So a component writes `bg-raised border-hairline text-ink rounded-card p-card`, and the same markup renders light in the portal and dark on the landing page. No `dark:` variants anywhere, and no theme prop threaded through components. A band of a page can switch theme on its own by setting `data-theme` (the landing page does this: dark hero, light content, dark footer).
 
-### 4.5 The lint rule that holds the line
+If a component needs a value that has no utility, add the mapping to `globals.css`. If the value has no token either, add the variable in Figma first (§11.4).
 
-```js
-// eslint.config.js (excerpt)
-{
-  files: ["components/**/*.tsx", "app/**/*.tsx"],
-  rules: {
-    "no-restricted-syntax": [
-      "error",
-      {
-        selector: "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
-        message: "Raw hex is not allowed. Use a token class or a CSS variable from styles/tokens.css."
-      },
-      {
-        selector: "Literal[value=/\\b(rgb|rgba|hsl)\\(/]",
-        message: "Raw colour functions are not allowed. Use a token."
-      }
-    ]
-  }
-}
-```
+### 4.5 The lint rules that hold the line
 
-Add an arbitrary-value guard too: `className` strings matching `\[(#|rgb|\d+px)` fail review. Spacing exceptions go in the token file, not in a component.
+`eslint.config.mjs` applies these to `components/**` and `app/**`:
+
+| Pattern | Example that fails |
+|---|---|
+| Raw hex, in literals and template strings | `"text-[#2563eb]"` |
+| Raw colour functions | `"bg-[rgba(0,0,0,.2)]"` |
+| Arbitrary pixel values | `"p-[28px]"` |
+| Hand-written token variables where a utility exists | `"p-[var(--card-padding)]"` → use `p-card` |
+| `ui/` importing from `blocks/`, `states/` or `app/` | layer violation |
+| `FIXTURES` imported outside `app/dev` and tests | fixture leak |
+
+Grid templates may still reference a layout token (`lg:grid-cols-[1fr_var(--container-rail)]`), since Tailwind has no utility for a two-track template.
 
 ---
 
 ## 5. Component layer
 
-Every primitive maps 1:1 to something that already exists in the Figma file, so there is a visual reference for each.
+### 5.1 Principles
 
-```tsx
-// components/ui/button.tsx
-import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "@/lib/cn";
+- **Every primitive mirrors a named Figma layer.** The Figma file has no published components; screens are frames with consistent layer names (`Button / primary`, `Card / order summary`, `Rail step / done`). Those names are the component names here.
+- **Variant names match Figma.** `Button` variants are `primary`, `ghost` (outlined) and `text` (no chrome), exactly as the layers are named. Figma's `Button / darkghost` is `ghost` inside `data-theme="marketing"`.
+- **Icons are Lucide.** Figma's icon layers are Lucide glyphs (`Icon / file-text`, `Icon / Lucide rocket`), so `components/ui/icon.tsx` renders the same glyph from `lucide-react` at 22px, the size every Figma screen uses. Do not draw SVGs by hand and do not use emoji where Figma has an icon.
+- **Two type families, two jobs.** Screen and section titles use the BRA serif (`<Heading>`, Instrument Serif). Card titles, labels and body use Inter (`<CardTitle>`, `type-body*`). This is what the Figma status headers, modals and marketing page do.
+- **Tokens win over loose frames.** Some Figma frames use loose hex values that are not bound to variables (Form Step 1 uses `#e2e8f0` borders and a 6px radius; the landing page uses a few one-off tints). Where a frame and a token disagree, the component uses the token, and the frame is logged in §13.
 
-const button = cva(
-  "inline-flex items-center justify-center gap-2 rounded-control font-semibold " +
-  "transition-colors focus-visible:outline-none focus-visible:shadow-[var(--focus-ring)] " +
-  "disabled:opacity-50 disabled:pointer-events-none",
-  {
-    variants: {
-      variant: {
-        primary:   "bg-action text-on-action hover:brightness-95",
-        secondary: "bg-raised text-ink-2 border border-hairline hover:bg-inset",
-        ghost:     "text-muted hover:text-ink",
-        danger:    "bg-danger text-danger-ink hover:brightness-95",
-      },
-      size: {
-        sm: "h-9  px-4 text-[length:var(--font-size-body-sm)]",
-        md: "h-12 px-5 text-[length:var(--font-size-body-lg)]",
-        lg: "h-[60px] px-5 text-[length:var(--font-size-body-lg)]",
-      },
-      full: { true: "w-full" },
-    },
-    defaultVariants: { variant: "primary", size: "md" },
-  }
-);
+### 5.2 Primitives (`components/ui`)
 
-export type ButtonProps =
-  React.ButtonHTMLAttributes<HTMLButtonElement> &
-  VariantProps<typeof button> & { loading?: boolean };
+| Component | Variants / props | Figma layer | Reference node |
+|---|---|---|---|
+| `Button`, `buttonStyles` | `primary` `ghost` `text` `danger` × `sm` `md` `lg` × `full`, `loading`, `disabled` | `Button / primary · ghost · text · darkghost` | S-13 `7364:178` |
+| `Card`, `CardTitle` | default, `compact`; `as` section/article/div | `Card / *` | S-13 `7364:23` |
+| `Heading` | `display` `h1` `h2` `h3`; `as` | text styles `BRA/*` | S-13 `7364:26` |
+| `Chip` | `neutral` `success` `warning` `danger` `info` | `Chip / status`, `Chip / delivery promise` | S-13 `7364:29` |
+| `StatusBadge` | `queued` `running` `ready` `delayed` `blocked` `failed` `refunded` `credit` (glyph + word) | `Status badge` | S-16 `7366:44` |
+| `Icon` | any Lucide icon; `sm` 16, `md` 22, `lg` 28; `label` for meaningful icons | `Icon / *` | |
+| `IconTile` | `icon` or `emoji`; tone + `action`; `xs` 34, `sm` 40, `md` 48, `lg` 56, `xl` 64 | `Icon tile`, `Icon tile / status` | S-13 `7364:24` |
+| `Avatar` | initials, `md` 34, `lg` 56 | nav initials tile | S-16 `7366:11` |
+| `Note` | five tones, default icon per tone, `icon` or `glyph` override | `Note` | S-03 `7358:12` |
+| `Banner` | tone, `icon`, `inset` (rounded) or full-bleed, `actions` | `Banner / claim account · unverified email · shared` | S-13 `7364:13`, S-16 `7366:30` |
+| `Input`, `inputStyles` | `default` `valid` `warning` `error`; `trailing` status icon | `Input`, `Text Input`, `URL Input`, `Password Input` | S-01 `7369:2` |
+| `Select` | same states as `Input`; native select | `Dropdown` | Form Step 1 `7203:2784` |
+| `Checkbox` | native, with label | `Checkbox` | Create your account `7236:131` |
+| `Field` | `label`, `hint`, `required`, `message` (neutral/success/warning/danger) | `Field` | S-18b `7368:50`, S-01 |
+| `Modal` | `sm` 412 `md` 440 `lg` 480 `xl` 580; presentational panel | `Modal`, `Modal / *` | S-03 `7358:6` |
+| `ProgressBar` | 0–100, labelled | Form Step 1 progress, S-16 row bar | `7203:2747` |
+| `Tabs` | link tabs with `aria-current` | `Portal tabs` | S-16 `7366:13` |
+| `SummaryRow` | default, `emphasis` | `Summary row` | S-13 `7364:36` |
+| `Stat` | `neutral` `danger` `warning` | `Stat` | S-13 `7364:167` |
+| `TimelineStep` | `done` `active` `pending` `scheduled` `failed` | `Rail step / *` | S-13 `7364:125` |
+| `CodeBlock` | string content | `Code block` | S-08 `7361:2` |
+| `EmptyState` | icon, title, body, action | `Empty state` | S-16 `7366:70` |
 
-export function Button({ className, variant, size, full, loading, children, ...props }: ButtonProps) {
-  return (
-    <button className={cn(button({ variant, size, full }), className)} aria-busy={loading} {...props}>
-      {loading ? <Spinner className="size-4" /> : null}
-      {children}
-    </button>
-  );
-}
-```
+`Note` deserves a mention. It is the small tinted strip that states what happened to the money. It appears on nine of the state screens and it is the component most responsible for whether a failure feels handled or feels like theft. It is a primitive, and `blocks/` is not allowed to reimplement it.
 
-The full primitive list, with the Figma component each mirrors:
+### 5.3 Blocks (`components/blocks`)
 
-| `ui/` component | Variants | Mirrors |
+| Block | What it composes | Figma |
 |---|---|---|
-| `Button` | primary, secondary, ghost, danger × sm/md/lg × loading, disabled | Hero CTA |
-| `Input` | default, focus, valid, error, locked; optional suffix + helper | Form Step 1 URL field |
-| `Select` | same states as Input | Form Step 1 Industry |
-| `Card` | default, compact; `as` for section vs article | Order Summary |
-| `Chip` | neutral, success, warning, error, info | Hero chips |
-| `StatusBadge` | queued, running, ready, delayed, blocked, failed, refunded | S-16 row badges |
-| `TimelineStep` | complete, active, pending, scheduled, failed | Report Progress rail |
-| `IconTile` | 32/40/48/56/64/72/80 × 5 tints | Section tiles |
-| `Modal` | 412/440/480/580 | Signup modal |
-| `ProgressBar` | determinate, indeterminate | "Step 1 of 2" |
-| `SummaryRow` | default, emphasised | Order summary line |
-| `Note` | success, warning, error, info, neutral | The green money strip |
-| `EmptyState` | — | S-16 empty |
-| `Stat` | neutral, danger, warning | S-13 findings preview |
+| `AppNav` | rocket `IconTile`, links, optional `Avatar` | `App nav bar` |
+| `StatusLayout` | claim `Banner`, status header `Card` + `Heading`, `OrderSummaryCard`, `ProgressRail` | the S-06 shell, all order states |
+| `OrderSummaryCard` | `Card` + `SummaryRow` | `Card / order summary` |
+| `ProgressRail` | `Card` + `TimelineStep` + `Note` | `Card / report progress` |
+| `DeliveryPromise` | `Chip`, date from `lib/orders/sla` | `Chip / delivery promise` |
+| `FindingRow` | `Chip` + text | `Finding / critical · warn · ok` |
+| `REPORT_SECTIONS` | names, icons and contents of the four sections | landing page, S-09, S-14 |
+| `MarketingSection` | a themed band with eyebrow, `Heading`, intro | landing page sections |
+| `LandingHero` … `SiteFooter` | the landing page bands | `7203:2155` |
 
-**`Note` deserves a mention.** It is the small tinted strip that states what happened to the money. It appears on nine of the state screens and it is the component most responsible for whether a failure feels handled or feels like theft. It is a primitive, not an afterthought, and `blocks/` is not allowed to reimplement it.
+### 5.4 Reviewing components
+
+`/dev/components` renders every primitive in both themes, with the Figma layer name beside each one. `/dev/states` lists every order state. Both are hidden in production unless `NEXT_PUBLIC_SHOW_STATE_GALLERY=true`. Review token and primitive changes on the PR preview there, not in Figma.
+
+### 5.5 Getting details from a Figma screen
+
+With the Figma connector enabled, an agent reads a screen with `get_design_context` on its node id (for example S-13 is `7364:2` in file `43WfRGUtWOHJa3Q7fAZFj7`). The response is React + Tailwind with Figma's own variable names and pixel values. Treat it as a reference, never as code to paste:
+
+1. Map each `data-name` to the primitive in §5.2. `Button / ghost` is `<Button variant="ghost">`, `Card / status header` is the header card inside `StatusLayout`.
+2. Map each `var(--bra-…)` to the utility in §4.4. `bg-[var(--bra-surface-raised)]` is `bg-raised`; `px-[28px]` on a card is `p-card`.
+3. Map `Icon / <name>` to the Lucide icon of the same name.
+4. If a value has no token, it is either a loose frame (use the nearest token and note it in §13) or a genuinely new token (add it in Figma first).
+5. Copy about time, price or refunds always comes from `lib/orders/sla`, even when the Figma text says something different.
 
 ---
 
@@ -599,7 +558,7 @@ Account is created **after** payment, silently, from the email captured at check
 Non-negotiable, checked in CI:
 
 - WCAG 2.2 AA. Both theme modes are contrast-tested, since the same component renders on both.
-- Focus is visible everywhere. `--focus-ring` is a 3px amber ring, tested at 3:1 against both `surface/page` values.
+- Focus is visible everywhere. `shadow-focus` (the `focus/ring` effect) is a 3px blue ring, tested at 3:1 against both `surface/page` values.
 - Status is never colour alone. Every `StatusBadge` carries a glyph and a word.
 - Touch targets 44px minimum. `Button size="sm"` is 36px and is therefore desktop-only, enforced by a prop guard.
 - Polling respects `prefers-reduced-motion`: the progress rail stops animating, values still update.
@@ -684,3 +643,7 @@ These block specific files and should be answered before the phase that needs th
 | 4 | Bank transfer fallback for declined cards? | S-03, highest-value recovery path |
 | 5 | Report retention period, and what happens after it | S-14 stale state, data policy |
 | 6 | Does the FigJam research contradict anything here? | everything, research wins |
+| 7 | The Figma landing page says reports "run every day, including weekends". The SLA and S-22 say Monday to Friday. The code follows the SLA. Which is right? | landing FAQ and chips, `SLA.workDays` |
+| 8 | Form Step 1 in Figma draws inputs with a hairline border and 6px radius; the `input/*` tokens say `border/strong` and 10px. The code follows the tokens (strong also meets the 3:1 contrast rule for form borders). Update the frame, or change the token? | `Input`, `Select` |
+| 9 | Figma's landing page has a newsletter "Subscribe" field and a "Notify me" waitlist. There is no mailing-list backend yet, so the code links to email instead. Which provider? | footer, pricing card |
+| 10 | The unnumbered `Space` and `Radius` collections in Figma duplicate `3. Scale`. Delete them? | token build warnings |
