@@ -11,7 +11,7 @@
   --color-*: initial;
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
-  --font-label: "Plus Jakarta Sans", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-label: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 }
 
 @theme inline {
