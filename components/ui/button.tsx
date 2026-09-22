@@ -1,33 +1,41 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 
+/**
+ * Variant names match the Figma layers: "Button / primary", "Button / ghost"
+ * (outlined), "Button / text" (no chrome) and "Button / darkghost" (outlined,
+ * on the dark marketing surface; the ghost variant covers it because the
+ * tokens flip with data-theme).
+ */
 export const buttonStyles = cva(
-  "inline-flex items-center justify-center gap-2 rounded-control font-semibold transition-colors " +
+  "inline-flex items-center justify-center gap-button-gap rounded-control font-semibold transition-colors " +
     "disabled:pointer-events-none disabled:bg-disabled disabled:text-muted",
   {
     variants: {
       variant: {
         primary: "bg-action text-on-action hover:bg-action-hover",
-        secondary: "bg-action-2 text-ink-2 border border-hairline hover:bg-inset",
-        ghost: "text-muted hover:text-ink",
+        ghost: "border border-hairline bg-action-2 text-ink-2 hover:bg-inset",
+        text: "font-medium text-ink-2 hover:text-ink",
         danger: "bg-danger text-danger-ink hover:bg-danger-accent hover:text-on-action",
       },
       size: {
-        sm: "h-9 px-4 text-sm",
-        md: "h-12 px-5 text-base",
-        lg: "h-15 px-5 text-base",
+        sm: "h-control-sm px-4 text-sm",
+        md: "h-control-md px-button-x text-base",
+        lg: "h-control-xl px-button-x text-base",
       },
       full: { true: "w-full" },
     },
+    compoundVariants: [{ variant: "text", class: "h-auto px-0 py-2" }],
     defaultVariants: { variant: "primary", size: "md" },
   },
 );
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<typeof buttonStyles> & { loading?: boolean };
 
-export function Button({ className, variant, size, full, loading, children, disabled, ...props }: Props) {
+export function Button({ className, variant, size, full, loading, children, disabled, type = "button", ...props }: Props) {
   return (
     <button
+      type={type}
       className={cn(buttonStyles({ variant, size, full }), className)}
       aria-busy={loading || undefined}
       disabled={disabled || loading}

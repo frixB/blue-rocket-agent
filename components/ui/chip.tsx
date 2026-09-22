@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 
 export const chipStyles = cva(
-  "inline-flex items-center gap-1.5 rounded-chip px-[var(--chip-padding-x)] py-[var(--chip-padding-y)] type-caption-strong",
+  "inline-flex items-center gap-1.5 rounded-chip px-chip-x py-chip-y type-caption-strong",
   {
     variants: {
       tone: {
