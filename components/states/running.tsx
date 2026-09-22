@@ -1,3 +1,4 @@
+import { ChartColumn, Clock } from "lucide-react";
 import { Card, CardTitle } from "@/components/ui";
 import { StatusLayout } from "@/components/blocks/status-layout";
 import { DeliveryPromise } from "@/components/blocks/delivery-promise";
@@ -10,7 +11,7 @@ export function Running({ order }: StateProps) {
   return (
     <StatusLayout
       order={order}
-      tile={{ emoji: queued ? "🕘" : "⚡", tone: "warning" }}
+      tile={{ icon: queued ? Clock : ChartColumn, tone: "warning" }}
       heading={overnight ? `Your report starts ${formatDay(workStartsAt(new Date(order.paidAt)))}` : "Your report is being generated"}
       body="Payment confirmed. Our AI agents are working through your site and compiling your SEO report. You can close this page. It will be here when you come back."
       chips={<><DeliveryPromise paidAt={order.paidAt} />{!queued && <RunningChip />}</>}
