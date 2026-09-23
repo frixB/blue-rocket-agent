@@ -93,3 +93,16 @@ export const FIXTURES: Record<string, Order> = {
 export async function getOrder(id: string): Promise<Order | null> {
   return FIXTURES[id] ?? null;
 }
+
+/** Every paid order on the signed-in account, newest first. S-16 and S-17 read this. */
+export async function listOrders(): Promise<Order[]> {
+  return Object.values(FIXTURES)
+    .filter((o) => o.status !== "awaiting_payment" && o.status !== "payment_failed")
+    .sort((a, b) => b.paidAt.localeCompare(a.paidAt) || b.reference.localeCompare(a.reference));
+}
+
+/** The signed-in customer. Replace with the session once auth exists. */
+export type Account = { name: string; email: string; emailVerified: boolean };
+export async function getAccount(): Promise<Account> {
+  return { name: "Bob Johnson", email: base.email, emailVerified: false };
+}
