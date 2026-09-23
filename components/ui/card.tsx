@@ -6,8 +6,8 @@ export function Card({ as: Tag = "section", compact, className, ...props }: Prop
   return (
     <Tag
       className={cn(
-        "flex flex-col gap-[var(--card-gap)] rounded-card border border-hairline bg-raised",
-        compact ? "p-[var(--card-padding-compact)]" : "p-[var(--card-padding)]",
+        "flex flex-col gap-card-gap rounded-card border border-hairline bg-raised",
+        compact ? "p-card-compact" : "p-card",
         className,
       )}
       {...props}

@@ -1,3 +1,4 @@
+import { RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { Card, CardTitle, Chip, buttonStyles } from "@/components/ui";
 import { StatusLayout } from "@/components/blocks/status-layout";
@@ -5,7 +6,7 @@ import { RefundNote, type StateProps } from "./shared";
 
 export function Refunded({ order }: StateProps) {
   return (
-    <StatusLayout order={order} showClaim={false} tile={{ emoji: "↩️", tone: "info" }}
+    <StatusLayout order={order} showClaim={false} tile={{ icon: RefreshCw, tone: "info" }}
       heading="Your payment has been refunded"
       body={order.refund?.reason ?? "This order was refunded."}
       chips={<Chip tone="info">↩ Refunded</Chip>}>

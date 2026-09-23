@@ -53,9 +53,64 @@
   --color-pending-ink: var(--status-pending-ink);
   --color-transparent: transparent;
   --color-current: currentColor;
+  /* component: input (4. Component / input/*) */
+  --color-input: var(--input-bg);
+  --color-input-border: var(--input-border);
+  --color-input-placeholder: var(--input-placeholder);
+  --color-input-valid: var(--input-bg-valid);
+  --color-input-valid-border: var(--input-border-valid);
+  --color-input-error: var(--input-bg-error);
+  --color-input-error-border: var(--input-border-error);
 
-  /* radius */
+  /*
+   * spacing. The base unit is space/05 (4px), so p-4 = 16px = space/2 and the
+   * numeric scale stays on the Figma grid. Named steps below are the
+   * component tokens: `p-card`, `px-chip-x`, `h-control-md`, `size-tile-xl`.
+   */
+  --spacing: var(--space-05);
+  --spacing-card: var(--card-padding);
+  --spacing-card-compact: var(--card-padding-compact);
+  --spacing-card-gap: var(--card-gap);
+  --spacing-chip-x: var(--chip-padding-x);
+  --spacing-chip-y: var(--chip-padding-y);
+  --spacing-button-x: var(--button-padding-x);
+  --spacing-button-gap: var(--button-gap);
+  --spacing-input-x: var(--input-padding-x);
+  --spacing-input-y: var(--input-padding-y);
+  --spacing-modal: var(--modal-padding);
+  --spacing-modal-gap: var(--modal-gap);
+  --spacing-nav-x: var(--nav-padding-x);
+  --spacing-nav-y: var(--nav-padding-y);
+  --spacing-page-top: var(--page-top);
+  --spacing-page-bottom: var(--page-bottom);
+  --spacing-section: var(--page-section-gap);
+  --spacing-rail-gap: var(--rail-gap);
+  --spacing-rail-marker: var(--rail-marker-size);
+  --spacing-rail-connector: var(--rail-connector-height);
+  --spacing-control-sm: var(--size-control-sm);
+  --spacing-control-md: var(--size-control-md);
+  --spacing-control-lg: var(--size-control-lg);
+  --spacing-control-xl: var(--size-control-xl);
+  --spacing-input: var(--input-height);
+  --spacing-avatar: var(--size-avatar);
+  --spacing-avatar-lg: var(--size-avatar-lg);
+  --spacing-tile-sm: var(--size-icon-sm);
+  --spacing-tile-md: var(--size-icon-md);
+  --spacing-tile-lg: var(--size-icon-lg);
+  --spacing-tile-xl: var(--size-icon-xl);
+  --spacing-tile-2xl: var(--size-icon-2xl);
+  --spacing-tile-3xl: var(--size-icon-3xl);
+  --spacing-tile-4xl: var(--size-icon-4xl);
+  --spacing-tile-5xl: var(--size-icon-5xl);
+  --spacing-bar: var(--border-width-bar);
+
+  /*
+   * radius. rounded-xs … rounded-full resolve to the 3. Scale radius tokens
+   * (tokens.css defines --radius-* unlayered, so they win over Tailwind's
+   * defaults). The names below are the component radii.
+   */
   --radius-control: var(--button-radius);
+  --radius-input: var(--input-radius);
   --radius-card: var(--card-radius);
   --radius-chip: var(--chip-radius);
   --radius-tile: var(--icon-tile-radius);
@@ -67,9 +122,17 @@
   --shadow-overlay: var(--effect-elevation-overlay);
   --shadow-focus: var(--effect-focus-ring);
 
-  /* layout widths */
+  /* layout widths: max-w-app, max-w-main, w-rail, max-w-modal-md … */
   --container-app: var(--layout-container-app);
   --container-report: var(--layout-container-report);
+  --container-main: var(--layout-column-main);
+  --container-wide: var(--layout-column-wide);
+  --container-side: var(--layout-column-side);
+  --container-rail: var(--layout-column-rail);
+  --container-modal-sm: var(--layout-modal-sm);
+  --container-modal-md: var(--layout-modal-md);
+  --container-modal-lg: var(--layout-modal-lg);
+  --container-modal-xl: var(--layout-modal-xl);
 }
 
 @layer base {

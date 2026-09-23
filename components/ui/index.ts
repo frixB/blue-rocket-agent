@@ -1,8 +1,24 @@
+// The primitive layer. Each one mirrors a named layer in the Figma file;
+// docs/architecture.md §5 has the full map with node ids.
+export { Avatar } from "./avatar";
+export { Banner } from "./banner";
 export { Button, buttonStyles } from "./button";
 export { Card, CardTitle } from "./card";
+export { Checkbox } from "./checkbox";
 export { Chip, type Tone } from "./chip";
+export { CodeBlock } from "./code-block";
+export { EmptyState } from "./empty-state";
+export { Field } from "./field";
+export { Heading } from "./heading";
+export { Icon, type LucideIcon } from "./icon";
 export { IconTile } from "./icon-tile";
+export { Input, inputStyles, type InputState } from "./input";
+export { Modal } from "./modal";
 export { Note } from "./note";
+export { ProgressBar } from "./progress-bar";
+export { Select } from "./select";
 export { Stat } from "./stat";
+export { StatusBadge, type BadgeKind } from "./status-badge";
 export { SummaryRow } from "./summary-row";
+export { Tabs } from "./tabs";
 export { TimelineStep } from "./timeline-step";

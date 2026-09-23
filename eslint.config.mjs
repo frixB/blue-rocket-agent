@@ -4,6 +4,8 @@ import nextTs from "eslint-config-next/typescript";
 const HEX = String.raw`#[0-9a-fA-F]{3,8}\b`;
 const RAW_COLOUR = String.raw`\b(rgba?|hsla?|oklch)\(`;
 const ARBITRARY_PX = String.raw`-\[\d+px\]`;
+// `p-[var(--card-padding)]` has a utility now (`p-card`). See styles/globals.css.
+const ARBITRARY_VAR = String.raw`(?:^|\s)[a-z:-]+-\[var\(--`;
 
 const tokenMessage = "Use a token. Raw colours and pixel values live in Figma and styles/tokens.css, not in components.";
 
@@ -21,6 +23,7 @@ const config = [
         { selector: `TemplateElement[value.raw=/${HEX}/]`, message: tokenMessage },
         { selector: `Literal[value=/${RAW_COLOUR}/]`, message: tokenMessage },
         { selector: `Literal[value=/${ARBITRARY_PX}/]`, message: tokenMessage },
+        { selector: `Literal[value=/${ARBITRARY_VAR}/]`, message: "Use the token utility (p-card, h-control-md, max-w-rail …) instead of [var(--…)]. Add one in styles/globals.css if it is missing." },
       ],
       "no-restricted-imports": ["error", {
         patterns: [{ group: ["@/lib/orders/fixtures"], importNames: ["FIXTURES"], message: "Fixtures are for the dev gallery and tests only." }],
