@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { Rocket } from "lucide-react";
-import { Heading, IconTile, buttonStyles } from "@/components/ui";
+import { SystemMessage } from "@/components/blocks/system-message";
+import { buttonStyles } from "@/components/ui";
 
+/** S-21a 404 not found (7369:298). */
 export default function NotFound() {
   return (
-    <main data-theme="marketing" className="flex min-h-dvh flex-col items-center justify-center gap-5 bg-page px-5 text-center text-ink">
-      <IconTile icon={Rocket} tone="action" size="xl" />
-      <Heading variant="display">This page has drifted off course</Heading>
-      <p className="type-body-lg max-w-md text-ink-2">The link may be broken, or the page may have moved. Your reports are all still in your dashboard.</p>
-      <Link href="/" className={buttonStyles()}>Back to home</Link>
-    </main>
+    <SystemMessage icon={Rocket} title="This page has drifted off course"
+      body="The link may be broken, or the page may have moved. Your reports are all still in your dashboard.">
+      <Link href="/reports" className={buttonStyles()}>Go to my reports</Link>
+      <Link href="/" className={buttonStyles({ variant: "darkghost" })}>Back to home</Link>
+    </SystemMessage>
   );
 }
