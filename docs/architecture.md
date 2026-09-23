@@ -259,7 +259,7 @@ Grid templates may still reference a layout token (`lg:grid-cols-[1fr_var(--cont
 ### 5.1 Principles
 
 - **Every primitive mirrors a named Figma layer.** The Figma file has no published components; screens are frames with consistent layer names (`Button / primary`, `Card / order summary`, `Rail step / done`). Those names are the component names here.
-- **Variant names match Figma.** `Button` variants are `primary`, `ghost` (outlined) and `text` (no chrome), exactly as the layers are named. Figma's `Button / darkghost` is `ghost` inside `data-theme="marketing"`.
+- **Variant names match Figma.** `Button` variants are `primary`, `ghost` (filled surface, hairline border), `text` (no chrome) and `darkghost` (transparent, strong border, for dark system screens), exactly as the layers are named.
 - **Icons are Lucide.** Figma's icon layers are Lucide glyphs (`Icon / file-text`, `Icon / Lucide rocket`), so `components/ui/icon.tsx` renders the same glyph from `lucide-react` at 22px, the size every Figma screen uses. Do not draw SVGs by hand and do not use emoji where Figma has an icon.
 - **Two type families, two jobs.** Screen and section titles use the BRA serif (`<Heading>`, Instrument Serif). Card titles, labels and body use Inter (`<CardTitle>`, `type-body*`). This is what the Figma status headers, modals and marketing page do.
 - **Tokens win over loose frames.** Some Figma frames use loose hex values that are not bound to variables (Form Step 1 uses `#e2e8f0` borders and a 6px radius; the landing page uses a few one-off tints). Where a frame and a token disagree, the component uses the token, and the frame is logged in §13.
@@ -268,7 +268,7 @@ Grid templates may still reference a layout token (`lg:grid-cols-[1fr_var(--cont
 
 | Component | Variants / props | Figma layer | Reference node |
 |---|---|---|---|
-| `Button`, `buttonStyles` | `primary` `ghost` `text` `danger` × `sm` `md` `lg` × `full`, `loading`, `disabled` | `Button / primary · ghost · text · darkghost` | S-13 `7364:178` |
+| `Button`, `buttonStyles` | `primary` `ghost` `text` `darkghost` `danger` × `sm` `md` `lg` × `full`, `loading`, `disabled` | `Button / primary · ghost · text · darkghost` | S-13 `7364:178` |
 | `Card`, `CardTitle` | default, `compact`; `as` section/article/div | `Card / *` | S-13 `7364:23` |
 | `Heading` | `display` `h1` `h2` `h3`; `as` | text styles `BRA/*` | S-13 `7364:26` |
 | `Chip` | `neutral` `success` `warning` `danger` `info` | `Chip / status`, `Chip / delivery promise` | S-13 `7364:29` |

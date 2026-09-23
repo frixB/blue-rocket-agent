@@ -18,6 +18,11 @@ const base = {
 };
 
 const stages = (...s: StageRecord[]) => s;
+const fixFirst = [
+  "Compress the homepage hero image. About an hour of work, and the biggest single traffic gain.",
+  "Fix the four broken menu links. Your own site is pointing Google at dead pages.",
+  "Build one page for \u201cemergency plumber Austin\u201d. It's the term you're closest to winning.",
+];
 const sections: NonNullable<Order["report"]>["sections"] = [
   { key: "technical", state: "complete", findings: [
     { severity: "critical", title: "Homepage takes 6.8s to load on mobile", body: "Above the 2.5s threshold Google uses. Mobile is 71% of your traffic." },
@@ -66,13 +71,14 @@ export const FIXTURES: Record<string, Order> = {
       { stage: "analysis", state: "failed", at: at(15, 11, 48), note: "Failed after 3 attempts" }, { stage: "compile", state: "pending" }, { stage: "delivery", state: "pending" }) },
 
   "demo-partial": { ...base, id: "demo-partial", reference: "BRA-4477", status: "partial", paidAt: at(15, 9, 14), claimed: true,
-    report: { issues: 19, critical: 3, monthlyVisitsLost: 1400, deliveredAt: at(15, 15, 26),
+    report: { issues: 19, critical: 3, monthlyVisitsLost: 1400, deliveredAt: at(15, 15, 26), score: 64, localRank: 7, pagesCrawled: 14, fixFirst,
       sections: [...sections.slice(0, 2), { key: "off_page", state: "unavailable", reason: "Your domain is 41 days old, so there is no backlink history yet.", findings: [] }, sections[3]!] },
     stages: stages({ stage: "payment", state: "done", at: at(15, 9, 14) }, { stage: "crawl", state: "done", at: at(15, 9, 41) },
       { stage: "analysis", state: "done", at: at(15, 13, 5), note: "3 of 4 sections" }, { stage: "compile", state: "done", at: at(15, 15, 22) }, { stage: "delivery", state: "done", at: at(15, 15, 26) }) },
 
   "demo-ready": { ...base, id: "demo-ready", reference: "BRA-4478", status: "ready", paidAt: at(15, 9, 14), claimed: true,
-    report: { issues: 23, critical: 4, monthlyVisitsLost: 1900, deliveredAt: at(15, 15, 26), sections },
+    shareToken: "demo-share",
+    report: { issues: 23, critical: 4, monthlyVisitsLost: 1900, deliveredAt: at(15, 15, 26), score: 61, localRank: 7, pagesCrawled: 14, fixFirst, sections },
     stages: stages({ stage: "payment", state: "done", at: at(15, 9, 14) }, { stage: "crawl", state: "done", at: at(15, 9, 41) },
       { stage: "analysis", state: "done", at: at(15, 13, 5) }, { stage: "compile", state: "done", at: at(15, 15, 22) }, { stage: "delivery", state: "done", at: at(15, 15, 26) }) },
 
@@ -105,4 +111,17 @@ export async function listOrders(): Promise<Order[]> {
 export type Account = { name: string; email: string; emailVerified: boolean };
 export async function getAccount(): Promise<Account> {
   return { name: "Bob Johnson", email: base.email, emailVerified: false };
+}
+
+/** Share links (S-15). Live for 30 days; `demo-expired` shows S-15b. */
+const SHARES: Record<string, { orderId: string; expiresAt: string }> = {
+  "demo-share": { orderId: "demo-ready", expiresAt: "2099-12-31T00:00:00.000Z" },
+  "demo-expired": { orderId: "demo-ready", expiresAt: at(15, 16) },
+};
+
+export async function getShare(token: string): Promise<{ order: Order; expired: boolean } | null> {
+  const share = SHARES[token];
+  const order = share && FIXTURES[share.orderId];
+  if (!share || !order) return null;
+  return { order, expired: new Date(share.expiresAt).getTime() < Date.now() };
 }

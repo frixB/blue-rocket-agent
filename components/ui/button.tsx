@@ -3,9 +3,9 @@ import { cn } from "@/lib/cn";
 
 /**
  * Variant names match the Figma layers: "Button / primary", "Button / ghost"
- * (outlined), "Button / text" (no chrome) and "Button / darkghost" (outlined,
- * on the dark marketing surface; the ghost variant covers it because the
- * tokens flip with data-theme).
+ * (filled surface, hairline border), "Button / text" (no chrome) and
+ * "Button / darkghost" (transparent, strong border; the secondary action on
+ * dark system screens).
  */
 export const buttonStyles = cva(
   "inline-flex items-center justify-center gap-button-gap rounded-control text-center font-semibold transition-colors " +
@@ -16,6 +16,7 @@ export const buttonStyles = cva(
         primary: "bg-action text-on-action hover:bg-action-hover",
         ghost: "border border-hairline bg-action-2 text-ink-2 hover:bg-inset",
         text: "font-medium text-ink-2 hover:text-ink",
+        darkghost: "border border-strong text-ink-2 hover:bg-inset",
         danger: "bg-danger text-danger-ink hover:bg-danger-accent hover:text-on-action",
       },
       size: {

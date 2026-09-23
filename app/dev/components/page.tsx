@@ -37,11 +37,12 @@ function Gallery({ p }: { p: string }) {
         <Heading as="p" variant="h3">Heading 3</Heading>
       </Row>
 
-      <Row title="Button" figma="Button / primary · ghost · text">
+      <Row title="Button" figma="Button / primary · ghost · text · darkghost">
         <div className="flex flex-wrap items-center gap-3">
           <Button>Primary</Button>
           <Button variant="ghost">Ghost</Button>
           <Button variant="text">Text</Button>
+          <Button variant="darkghost">Dark ghost</Button>
           <Button variant="danger">Danger</Button>
           <Button size="sm">Small</Button>
           <Button size="lg">Large</Button>

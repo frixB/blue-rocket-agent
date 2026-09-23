@@ -29,7 +29,16 @@ export type Order = {
     critical: number;
     monthlyVisitsLost: number;
     deliveredAt: string;
+    /** Overall health, 0 to 100. */
+    score: number;
+    /** Average position for the business's main local terms. */
+    localRank: number;
+    pagesCrawled: number;
+    /** The three things to do first, in order. Rendered verbatim. */
+    fixFirst: string[];
     sections: ReportSection[];
   };
   claimed: boolean;
+  /** Read-only share link token (S-15), if the owner created one. */
+  shareToken?: string;
 };
