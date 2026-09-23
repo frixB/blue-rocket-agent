@@ -78,11 +78,14 @@ const family = (f) => ({
   "Instrument Serif": 'var(--font-serif)',
   "Plus Jakarta Sans": 'var(--font-label)',
 }[f] ?? `"${f}", var(--font-sans)`);
+// A family counts as loaded when app/layout.tsx imports its @fontsource package.
+const layout = readFileSync(join(root, "app/layout.tsx"), "utf8");
+const loaded = (f) => f === "Inter" || new RegExp(`@fontsource(-variable)?/${slug(f)}\\b`).test(layout);
 let type = header;
 for (const t of data.text) {
   const lh = t.lineHeightUnit === "PERCENT" ? String(+(t.lineHeight / 100).toFixed(3)) : `${t.lineHeight}px`;
   type += `\n@utility type-${slug(t.name)} {\n  font-family: ${family(t.family)};\n  font-size: ${t.size}px;\n  font-weight: ${weight[t.style] ?? 400};\n  line-height: ${lh};\n  letter-spacing: ${t.letterSpacing}px;\n}\n`;
-  if (t.family !== "Inter") warnings.push(`Text style "${t.name}" uses ${t.family}. Load it in app/layout.tsx or this style falls back to the system font.`);
+  if (!loaded(t.family)) warnings.push(`Text style "${t.name}" uses ${t.family}. Load it in app/layout.tsx or this style falls back to the system font.`);
 }
 
 mkdirSync(join(root, "styles"), { recursive: true });
