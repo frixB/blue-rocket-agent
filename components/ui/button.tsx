@@ -19,13 +19,13 @@ export const buttonStyles = cva(
         danger: "bg-danger text-danger-ink hover:bg-danger-accent hover:text-on-action",
       },
       size: {
-        sm: "h-control-sm px-4 text-sm",
-        md: "h-control-md px-button-x text-base",
-        lg: "h-control-xl px-button-x text-base",
+        sm: "min-h-control-sm px-4 py-1.5 text-sm",
+        md: "min-h-control-md px-button-x py-2 text-base",
+        lg: "min-h-control-xl px-button-x py-3 text-base",
       },
       full: { true: "w-full" },
     },
-    compoundVariants: [{ variant: "text", class: "h-auto px-0 py-2" }],
+    compoundVariants: [{ variant: "text", class: "min-h-0 px-0 py-2" }],
     defaultVariants: { variant: "primary", size: "md" },
   },
 );

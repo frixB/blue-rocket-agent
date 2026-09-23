@@ -9,7 +9,7 @@ export function Select({ state = "default", className, children, ...props }: Rea
     <div className={cn(inputStyles({ state }), "relative", className)}>
       <select
         aria-invalid={state === "error" || undefined}
-        className="h-full min-w-0 flex-1 cursor-pointer appearance-none bg-transparent pr-7 outline-none"
+        className="h-full min-w-0 flex-1 cursor-pointer appearance-none bg-transparent pr-7 outline-none focus-visible:shadow-none"
         {...props}
       >
         {children}

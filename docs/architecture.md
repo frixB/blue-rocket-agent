@@ -558,7 +558,7 @@ Account is created **after** payment, silently, from the email captured at check
 Non-negotiable, checked in CI:
 
 - WCAG 2.2 AA. Both theme modes are contrast-tested, since the same component renders on both.
-- Focus is visible everywhere. `shadow-focus` (the `focus/ring` effect) is a 3px blue ring, tested at 3:1 against both `surface/page` values.
+- Focus is visible everywhere. `shadow-focus` is the Figma `focus/ring` effect, a 3px ring, and must reach 3:1 against both `surface/page` values. It is currently amber at 45% opacity, left over from the old brand, while `border/focus` is blue (see §13).
 - Status is never colour alone. Every `StatusBadge` carries a glyph and a word.
 - Touch targets 44px minimum. `Button size="sm"` is 36px and is therefore desktop-only, enforced by a prop guard.
 - Polling respects `prefers-reduced-motion`: the progress rail stops animating, values still update.
@@ -647,3 +647,4 @@ These block specific files and should be answered before the phase that needs th
 | 8 | Form Step 1 in Figma draws inputs with a hairline border and 6px radius; the `input/*` tokens say `border/strong` and 10px. The code follows the tokens (strong also meets the 3:1 contrast rule for form borders). Update the frame, or change the token? | `Input`, `Select` |
 | 9 | Figma's landing page has a newsletter "Subscribe" field and a "Notify me" waitlist. There is no mailing-list backend yet, so the code links to email instead. Which provider? | footer, pricing card |
 | 10 | The unnumbered `Space` and `Radius` collections in Figma duplicate `3. Scale`. Delete them? | token build warnings |
+| 11 | The `focus/ring` effect is amber `rgba(245,165,36,.45)` from the old brand; everything else focus-related is blue. Change it to blue in Figma? | every focusable element |

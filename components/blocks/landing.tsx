@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { Check, FlaskConical, Rocket } from "lucide-react";
+import { Check, FlaskConical } from "lucide-react";
 import { Card, Chip, Heading, Icon, IconTile, buttonStyles } from "@/components/ui";
 import { SLA, formatPrice } from "@/lib/orders/sla";
+import { Brand } from "./brand";
 import { MarketingSection } from "./marketing-section";
 import { REPORT_SECTIONS, SECTION_ORDER } from "./report-sections";
+import { WaitlistDialog } from "./waitlist-dialog";
 
 /*
  * The landing page bands, top to bottom, mirroring Figma node 7203:2155
@@ -13,15 +15,6 @@ import { REPORT_SECTIONS, SECTION_ORDER } from "./report-sections";
 
 const price = formatPrice(SLA.priceCents);
 const CONTACT = "hello@bluerocketagents.com";
-
-export function Brand() {
-  return (
-    <span className="flex items-center gap-3 type-body-lg font-bold text-ink">
-      <IconTile icon={Rocket} tone="action" size="xs" className="rounded-2xl" />
-      Blue Rocket Agents
-    </span>
-  );
-}
 
 function CheckItem({ children }: { children: React.ReactNode }) {
   return (
@@ -191,9 +184,9 @@ export function LandingPricing() {
           <IconTile icon={FlaskConical} tone="neutral" />
           <Heading as="h3" variant="h2">More reports</Heading>
           <p className="type-body text-ink-2">
-            We&apos;re building more specialised reports: Local SEO, Google Ads audit, content strategy and more. Ask to join the waitlist and you&apos;ll be first to know when they launch.
+            We&apos;re building more specialised reports: Local SEO, Google Ads audit, content strategy and more. Join the waitlist and you&apos;ll be first to know when they launch.
           </p>
-          <a href={`mailto:${CONTACT}?subject=${encodeURIComponent("Waitlist: more reports")}`} className={buttonStyles({ variant: "ghost", full: true })}>Notify me when available</a>
+          <WaitlistDialog />
         </Card>
       </div>
     </MarketingSection>

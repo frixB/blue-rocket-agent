@@ -24,7 +24,7 @@ export const inputStyles = cva(
 
 export type InputState = NonNullable<VariantProps<typeof inputStyles>["state"]>;
 
-type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> & {
+type Props = Omit<React.ComponentProps<"input">, "size"> & {
   state?: InputState;
   /** Trailing status glyph, e.g. <Icon icon={CircleCheck} />. */
   trailing?: React.ReactNode;
@@ -35,7 +35,7 @@ export function Input({ state = "default", trailing, className, ...props }: Prop
     <div className={cn(inputStyles({ state }), className)}>
       <input
         aria-invalid={state === "error" || undefined}
-        className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-input-placeholder"
+        className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-input-placeholder focus-visible:shadow-none"
         {...props}
       />
       {trailing}
