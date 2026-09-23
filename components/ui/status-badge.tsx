@@ -4,7 +4,7 @@ import { Chip, type Tone } from "./chip";
  * Figma "Status badge", S-16 report rows. Status is never colour alone:
  * every badge carries a glyph and a word.
  */
-export type BadgeKind = "queued" | "running" | "ready" | "delayed" | "blocked" | "failed" | "refunded" | "credit";
+export type BadgeKind = "queued" | "running" | "ready" | "delayed" | "blocked" | "failed" | "refunded" | "credit" | "paid";
 
 const BADGE: Record<BadgeKind, { tone: Tone; glyph: string; label: string }> = {
   queued: { tone: "neutral", glyph: "●", label: "Queued" },
@@ -15,6 +15,7 @@ const BADGE: Record<BadgeKind, { tone: Tone; glyph: string; label: string }> = {
   failed: { tone: "danger", glyph: "✕", label: "Failed" },
   refunded: { tone: "info", glyph: "↩", label: "Refunded" },
   credit: { tone: "info", glyph: "", label: "Credit" },
+  paid: { tone: "success", glyph: "✓", label: "Paid" },
 };
 
 export function StatusBadge({ kind }: { kind: BadgeKind }) {

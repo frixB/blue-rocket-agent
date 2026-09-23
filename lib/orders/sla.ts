@@ -115,6 +115,8 @@ export function formatDeliveryPromise(deadline: Date, now: Date = new Date()): s
 
 export const formatTime = (d: Date) => format(zoned(d), "HH:mm");
 export const formatDay = (d: Date) => format(zoned(d), "EEE HH:mm");
+/** "16 Sep 2026", for lists and receipts. */
+export const formatDate = (d: Date) => format(zoned(d), "dd MMM yyyy");
 export const formatPrice = (cents: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 
