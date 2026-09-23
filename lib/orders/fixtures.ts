@@ -76,6 +76,14 @@ export const FIXTURES: Record<string, Order> = {
     stages: stages({ stage: "payment", state: "done", at: at(15, 9, 14) }, { stage: "crawl", state: "done", at: at(15, 9, 41) },
       { stage: "analysis", state: "done", at: at(15, 13, 5) }, { stage: "compile", state: "done", at: at(15, 15, 22) }, { stage: "delivery", state: "done", at: at(15, 15, 26) }) },
 
+  "demo-awaiting": { ...base, id: "demo-awaiting", reference: "BRA-4480", status: "awaiting_payment", paidAt: at(15, 9, 14),
+    stages: stages({ stage: "payment", state: "pending" }, { stage: "crawl", state: "pending" },
+      { stage: "analysis", state: "pending" }, { stage: "compile", state: "pending" }, { stage: "delivery", state: "pending" }) },
+
+  "demo-payment-failed": { ...base, id: "demo-payment-failed", reference: "BRA-4481", status: "payment_failed", paidAt: at(15, 9, 14),
+    stages: stages({ stage: "payment", state: "failed", note: "Card declined" }, { stage: "crawl", state: "pending" },
+      { stage: "analysis", state: "pending" }, { stage: "compile", state: "pending" }, { stage: "delivery", state: "pending" }) },
+
   "demo-refunded": { ...base, id: "demo-refunded", reference: "BRA-4479", status: "refunded", paidAt: at(15, 9, 14),
     refund: { reference: "BRA-4479-R", issuedAt: at(15, 10, 5), reason: "You asked us to refund instead of retrying" },
     stages: stages({ stage: "payment", state: "done", at: at(15, 9, 14) }, { stage: "crawl", state: "failed", note: "Blocked by robots.txt" },
