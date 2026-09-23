@@ -20,7 +20,7 @@ export const buttonStyles = cva(
         danger: "bg-danger text-danger-ink hover:bg-danger-accent hover:text-on-action",
       },
       size: {
-        sm: "min-h-control-sm px-4 py-1.5 text-sm",
+        sm: "min-h-control-md px-4 py-1.5 text-sm sm:min-h-control-sm",
         md: "min-h-control-md px-button-x py-2 text-base",
         lg: "min-h-control-xl px-button-x py-3 text-base",
       },

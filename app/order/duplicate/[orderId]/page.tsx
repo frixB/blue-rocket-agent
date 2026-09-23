@@ -4,7 +4,7 @@ import { ChartColumn } from "lucide-react";
 import { ContextLayout } from "@/components/blocks/context-layout";
 import { Heading, IconTile, Modal, Note, buttonStyles } from "@/components/ui";
 import { getOrder } from "@/lib/orders/fixtures";
-import { deliveryDeadline, formatDay, formatDeliveryPromise, formatPrice } from "@/lib/orders/sla";
+import { deliveryDeadline, formatDay, formatDeliveryPromise, formatPriceShort } from "@/lib/orders/sla";
 
 /**
  * S-04 (7368:102). Shown instead of Stripe when the same email already has a
@@ -25,7 +25,7 @@ export default async function DuplicateGuard({ params }: { params: Promise<{ ord
             Started {formatDay(paid)} for {new URL(order.websiteUrl).host}, delivering {formatDeliveryPromise(deliveryDeadline(paid))}. You don&apos;t need to pay again.
           </p>
         </div>
-        <Note tone="success">Your {formatPrice(order.amountCents)} from the first order covers this report. Nothing extra has been charged.</Note>
+        <Note tone="success">Your {formatPriceShort(order.amountCents)} from the first order covers this report. Nothing extra has been charged.</Note>
         <Link href={`/reports/${order.id}`} className={buttonStyles({ full: true })}>View my report</Link>
         <Link href="/order" className={buttonStyles({ variant: "ghost", full: true })}>No, this is a different site. Continue anyway</Link>
       </Modal>

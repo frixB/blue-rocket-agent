@@ -28,7 +28,7 @@ export function CheckInbox({ email, body, onResend }: { email: string; body: str
       </div>
       <Note icon={Mail}>We sent it to {email}</Note>
       <a href="mailto:" className={buttonStyles({ full: true })}>Open email app</a>
-      <Button variant="text" full onClick={onResend}>Didn&apos;t get it? Resend · Check your spam folder</Button>
+      <Button variant="text" full onClick={onResend}>Didn&apos;t get it? Check your spam folder, or send it again</Button>
     </>
   );
 }
@@ -159,7 +159,7 @@ export function ClaimAccountForm({ email, orderId }: { email: string; orderId: s
       <IconTile icon={Bookmark} tone="warning" size="lg" />
       <div className="flex flex-col gap-2.5">
         <Heading as="h2">Save your report</Heading>
-        <p className="type-body text-ink-2">Set a password and your report stays in your dashboard for good. Anything you buy later lands in the same place.</p>
+        <p className="type-body text-ink-2">Set a password and your report stays in My Reports for good. Anything you buy later lands in the same place.</p>
       </div>
       <form action={run} className="flex flex-col gap-5">
         <Field htmlFor="email" label="Email">

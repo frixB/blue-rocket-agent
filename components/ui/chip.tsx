@@ -1,5 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
+import { Icon, type LucideIcon } from "./icon";
 
 export const chipStyles = cva(
   "inline-flex items-center gap-1.5 rounded-chip px-chip-x py-chip-y type-caption-strong",
@@ -19,6 +20,12 @@ export const chipStyles = cva(
 
 export type Tone = NonNullable<VariantProps<typeof chipStyles>["tone"]>;
 
-export function Chip({ tone, className, ...props }: React.HTMLAttributes<HTMLSpanElement> & VariantProps<typeof chipStyles>) {
-  return <span className={cn(chipStyles({ tone }), className)} {...props} />;
+/** Figma "Chip". Pass `icon` for a leading Lucide glyph; never an emoji. */
+export function Chip({ tone, icon, className, children, ...props }: React.HTMLAttributes<HTMLSpanElement> & VariantProps<typeof chipStyles> & { icon?: LucideIcon }) {
+  return (
+    <span className={cn(chipStyles({ tone }), className)} {...props}>
+      {icon && <Icon icon={icon} size="sm" />}
+      {children}
+    </span>
+  );
 }

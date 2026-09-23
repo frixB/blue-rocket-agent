@@ -10,7 +10,7 @@ export default async function Billing() {
   return (
     <>
       <PortalTabs />
-      <main className="mx-auto flex w-full max-w-app flex-col gap-5 px-5 pb-page-bottom pt-12">
+      <main id="main" className="mx-auto flex w-full max-w-app flex-col gap-5 px-5 pb-page-bottom pt-12">
         <PageHeader title="Billing" intro="Every payment and refund on your account." />
         <TransactionsTable rows={rows} />
         <Note>Receipts are emailed by Stripe when you pay. Need a copy? Reply to your receipt email and we&apos;ll resend it.</Note>

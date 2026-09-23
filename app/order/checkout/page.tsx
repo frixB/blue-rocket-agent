@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Lock } from "lucide-react";
+import { ArrowRight, Lock } from "lucide-react";
 import { ContextLayout } from "@/components/blocks/context-layout";
-import { Heading, IconTile, Modal, Note, ProgressBar, buttonStyles } from "@/components/ui";
+import { Heading, Icon, IconTile, Modal, Note, ProgressBar, buttonStyles } from "@/components/ui";
 import { previewEnabled } from "@/lib/preview";
 
 /**
@@ -23,7 +23,7 @@ export default function Checkout() {
         <Note>No charge has been made yet. If this takes more than 10 seconds, you can safely try again.</Note>
         {previewEnabled && (
           <Link href="/reports/demo-running" className={buttonStyles({ variant: "ghost", full: true })}>
-            Demo only: continue as if payment went through →
+            Demo only: continue as if payment went through <Icon icon={ArrowRight} size="sm" />
           </Link>
         )}
       </Modal>

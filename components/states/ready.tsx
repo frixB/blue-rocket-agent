@@ -1,6 +1,8 @@
-import { FileText, PartyPopper } from "lucide-react";
+import { Bookmark, Check, FileText, Gift, PartyPopper } from "lucide-react";
 import Link from "next/link";
-import { Button, Card, CardTitle, Chip, Note, Stat, buttonStyles } from "@/components/ui";
+import { Card, CardTitle, Chip, Note, Stat, buttonStyles } from "@/components/ui";
+import { CopyShareLink } from "@/components/blocks/copy-share-link";
+import { PdfDownload } from "@/components/blocks/pdf-download";
 import { SectionStatusList } from "@/components/blocks/section-status";
 import { StatusLayout } from "@/components/blocks/status-layout";
 import { deliveryDeadline, formatDay, formatDuration } from "@/lib/orders/sla";
@@ -29,12 +31,12 @@ export function Ready({ order }: StateProps) {
         : `Delivered in ${formatDuration(paid, delivered)}. We found ${r.issues} issues across your site, ${r.critical} of them critical. A copy is on its way to ${order.email}.`}
       chips={
         <>
-          <Chip tone={partial ? "warning" : "success"}>
-            ✓ Delivered {formatDay(delivered)}{early && !partial ? ", ahead of schedule" : ""}{partial ? ` · ${r.sections.length - missing.length} of ${r.sections.length} sections` : ""}
+          <Chip tone={partial ? "warning" : "success"} icon={Check}>
+            Delivered {formatDay(delivered)}{early && !partial ? ", ahead of schedule" : ""}{partial ? ` · ${r.sections.length - missing.length} of ${r.sections.length} sections` : ""}
           </Chip>
           {partial
-            ? <Chip tone="success"><span aria-hidden>●</span> Credit added to your account</Chip>
-            : order.claimed && <Chip><span aria-hidden>●</span> Saved to your dashboard</Chip>}
+            ? <Chip tone="success" icon={Gift}>Credit added to your account</Chip>
+            : order.claimed && <Chip icon={Bookmark}>Saved to My Reports</Chip>}
         </>
       }
     >
@@ -43,7 +45,7 @@ export function Ready({ order }: StateProps) {
           <>
             <CardTitle>What&apos;s in your report</CardTitle>
             <SectionStatusList sections={r.sections} />
-            <Note tone="success">We&apos;ve credited you a free backlink report, redeemable any time after your domain is 90 days old. It&apos;s already in your dashboard.</Note>
+            <Note tone="success">We&apos;ve credited you a free backlink report, redeemable any time after your domain is 90 days old. It&apos;s already in My Reports.</Note>
           </>
         ) : (
           <>
@@ -58,8 +60,8 @@ export function Ready({ order }: StateProps) {
         )}
         <div className="flex flex-col gap-2.5">
           <Link href={`/reports/${order.id}/report`} className={buttonStyles({ full: true })}>Read your report</Link>
-          <Button variant="ghost" full>Download PDF</Button>
-          {!partial && <Button variant="text" full>Email it to someone else</Button>}
+          <PdfDownload id={order.id} full />
+          {!partial && <CopyShareLink token={order.shareToken} label="Copy a link to share it" variant="text" full />}
         </div>
       </Card>
     </StatusLayout>

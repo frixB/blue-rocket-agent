@@ -2,7 +2,7 @@ import { ChartColumn, Clock } from "lucide-react";
 import { Card, CardTitle, StepList } from "@/components/ui";
 import { StatusLayout } from "@/components/blocks/status-layout";
 import { DeliveryPromise } from "@/components/blocks/delivery-promise";
-import { formatDay, formatPrice, queueReason, workStartsAt } from "@/lib/orders/sla";
+import { formatDay, formatPriceShort, queueReason, workStartsAt } from "@/lib/orders/sla";
 import { RunningChip, type StateProps } from "./shared";
 
 export function Running({ order }: StateProps) {
@@ -19,7 +19,7 @@ export function Running({ order }: StateProps) {
       <Card>
         <CardTitle>What happens next</CardTitle>
         <StepList steps={[
-          { title: "Payment confirmed", body: `Your ${formatPrice(order.amountCents)} payment was processed by Stripe.`, state: "done" },
+          { title: "Payment confirmed", body: `Your ${formatPriceShort(order.amountCents)} payment was processed by Stripe.`, state: "done" },
           { title: queued ? "Agents start soon" : "AI agents are working now", body: "Our agents analyse your site across 4 SEO areas.", state: queued ? "pending" : "active" },
           { title: "Report lands here and in your inbox", body: `We email ${order.email} the moment it's ready. This page updates either way.`, state: "pending" },
         ]} />

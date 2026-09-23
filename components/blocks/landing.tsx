@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { Check, FlaskConical } from "lucide-react";
+import { Check, FileText, FlaskConical, Timer } from "lucide-react";
 import { Card, Chip, Heading, Icon, IconTile, buttonStyles } from "@/components/ui";
-import { SLA, formatPrice } from "@/lib/orders/sla";
+import { SLA, formatPriceShort } from "@/lib/orders/sla";
 import { Brand } from "./brand";
-import { SiteNav } from "./site-nav";
 import { MarketingSection } from "./marketing-section";
 import { REPORT_SECTIONS, SECTION_ORDER } from "./report-sections";
 import { WaitlistDialog } from "./waitlist-dialog";
@@ -14,7 +13,7 @@ import { WaitlistDialog } from "./waitlist-dialog";
  * never from the design file.
  */
 
-const price = formatPrice(SLA.priceCents);
+const price = formatPriceShort(SLA.priceCents);
 const CONTACT = "hello@bluerocketagents.com";
 
 function CheckItem({ children }: { children: React.ReactNode }) {
@@ -28,9 +27,8 @@ function CheckItem({ children }: { children: React.ReactNode }) {
 
 export function LandingHero() {
   return (
-    <header className="px-5 pb-24 pt-10">
+    <section aria-label="Introduction" className="px-5 pb-24 pt-12">
       <div className="mx-auto flex w-full max-w-report flex-col gap-16">
-        <SiteNav />
         <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex max-w-2xl flex-col items-start gap-6">
             <Chip tone="info">SEO clarity for local businesses</Chip>
@@ -42,9 +40,9 @@ export function LandingHero() {
             </p>
             <Link href="/order" className={buttonStyles({ size: "lg" })}>Get started, {price}</Link>
             <ul className="flex flex-wrap gap-2" aria-label="What you can count on">
-              <li><Chip>✓ Flat fee, no surprises</Chip></li>
-              <li><Chip>⏱ Delivered within {SLA.businessDays} business day</Chip></li>
-              <li><Chip>PDF report</Chip></li>
+              <li><Chip icon={Check}>Flat fee, no surprises</Chip></li>
+              <li><Chip icon={Timer}>Delivered within {SLA.businessDays} business day</Chip></li>
+              <li><Chip icon={FileText}>Clear, prioritised report</Chip></li>
             </ul>
           </div>
           <Card className="w-full shrink-0 lg:max-w-rail">
@@ -66,7 +64,7 @@ export function LandingHero() {
           </Card>
         </div>
       </div>
-    </header>
+    </section>
   );
 }
 
@@ -169,7 +167,7 @@ export function LandingPricing() {
       intro="Start with our flagship SEO audit. More specialised reports are coming soon.">
       <div className="mx-auto grid w-full max-w-wide gap-5 md:grid-cols-2">
         <Card className="shadow-raised">
-          <Chip tone="success" className="self-start">✓ Available now</Chip>
+          <Chip tone="success" icon={Check} className="self-start">Available now</Chip>
           <Heading as="h3" variant="h2">{SLA.productName}</Heading>
           <p className="type-body text-ink-2">A four-section audit covering every aspect of your site&apos;s search performance, with prioritised action items.</p>
           <p className="flex items-baseline gap-2"><span className="type-display text-ink">{price}</span><span className="type-body-lg text-muted">flat fee</span></p>

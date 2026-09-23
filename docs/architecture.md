@@ -299,6 +299,8 @@ Grid templates may still reference a layout token (`lg:grid-cols-[1fr_var(--cont
 | Block | What it composes | Figma |
 |---|---|---|
 | `Brand` | rocket `IconTile` + wordmark | nav and footer lockup |
+| `CopyLink`, `CopyShareLink` | copy the current page or a share link, with "Link copied" feedback | Save my report link, Share |
+| `PdfDownload` | disabled Download PDF with a one-line reason | Download PDF |
 | `SiteNav` | landing top nav: What you get, Pricing, My Reports, Sign in, Get started | not in Figma (the hero shows only the logo); added so the landing page reaches sign-in and the portal |
 | `AppNav` | `Brand`, links, `Avatar` or "Sign in" | `App nav bar` |
 | `PortalTabs` | `Tabs` for My Reports / Billing | `Portal tabs` |
@@ -354,7 +356,23 @@ Not built, on purpose: **Confirmation** (`7203:2489`) and **Create your account*
 
 **What is still a stub.** Screens render from `lib/orders/fixtures.ts`. Stripe checkout, persistence of the intake form, auth and email (`app/actions/auth.ts` says plainly that sign-in isn't switched on), PDFs, receipts and share-link creation are not connected. The waitlist posts to `WAITLIST_WEBHOOK_URL` when set. `?preview=sent|error` shows the success and error states of the account screens on local and preview builds only (`lib/preview.ts`).
 
-### 5.6 Getting details from a Figma screen
+### 5.6 Copy and interaction rules
+
+Checked in the UX copy pass of September 2026. New screens follow them too.
+
+| Rule | In practice |
+|---|---|
+| One name per thing | The customer's area is **My Reports**, never "dashboard". The product is the **Detailed SEO Report**. |
+| No emoji as icons | Chips, badges, notes and buttons take a Lucide `icon` prop (`<Chip icon={Timer}>`). Typed arrows (→) become `<Icon icon={ArrowRight} />`. |
+| Every control does something | A button that needs a missing backend either opens an email to support with the order reference (`lib/support.ts` `supportHref`), copies a link (`CopyLink`), or is disabled with a sentence saying why (`PdfDownload`). Never a button that silently does nothing. |
+| Never promise what the code can't keep | No "encrypted", "we'll email you", or "check your inbox" unless it's true today. |
+| Errors say what happened and what to do | "We couldn't reach this site. It may be down, or the address may have a typo. Continue anyway…" |
+| Prices | `formatPriceShort` ("$1,500") in headlines, CTAs and sentences; `formatPrice` ("$1,500.00") in summaries, receipts and billing. |
+| Buttons start with a verb | "Copy my report link", "Try again for free", "Get your first report". |
+| Touch and keyboard | Every tap target is at least 44px on phones (`Button size="sm"` grows to 48px below `sm`); a "Skip to main content" link leads to `<main id="main">` on every page. |
+| Wrap, don't truncate | Names and titles wrap on small screens; status moves under the title in list rows. |
+
+### 5.7 Getting details from a Figma screen
 
 With the Figma connector enabled, an agent reads a screen with `get_design_context` on its node id (for example S-13 is `7364:2` in file `43WfRGUtWOHJa3Q7fAZFj7`). The response is React + Tailwind with Figma's own variable names and pixel values. Treat it as a reference, never as code to paste:
 
