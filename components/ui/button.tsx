@@ -8,7 +8,7 @@ import { cn } from "@/lib/cn";
  * tokens flip with data-theme).
  */
 export const buttonStyles = cva(
-  "inline-flex items-center justify-center gap-button-gap rounded-control font-semibold transition-colors " +
+  "inline-flex items-center justify-center gap-button-gap rounded-control text-center font-semibold transition-colors " +
     "disabled:pointer-events-none disabled:bg-disabled disabled:text-muted",
   {
     variants: {

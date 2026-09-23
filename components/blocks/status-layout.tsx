@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { Bookmark } from "lucide-react";
-import { Banner, Button, Card, Heading, IconTile, type LucideIcon, type Tone } from "@/components/ui";
+import { Banner, Button, Card, Heading, IconTile, buttonStyles, type LucideIcon, type Tone } from "@/components/ui";
 import { OrderSummaryCard } from "./order-summary-card";
 import { ProgressRail } from "./progress-rail";
 import type { Order } from "@/lib/orders/types";
@@ -24,7 +25,7 @@ export function StatusLayout({ order, tile, heading, body, chips, children, show
       {showClaim && !order.claimed && (
         <Banner
           icon={Bookmark}
-          actions={<><Button size="sm">Set a password</Button><Button variant="text" className="type-body-sm">Not now</Button></>}
+          actions={<Link href={`/claim/${order.id}`} className={buttonStyles({ size: "sm" })}>Set a password</Link>}
         >
           Set a password and this report stays in your dashboard for good.
         </Banner>

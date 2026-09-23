@@ -10,7 +10,7 @@ export function AppNav({ userName }: { userName?: string }) {
       <nav aria-label="Account" className="flex items-center gap-6 type-body">
         <Link href="/reports" className="font-semibold text-ink-2 hover:text-ink">My Reports</Link>
         <a href="mailto:hello@bluerocketagents.com" className="text-muted hover:text-ink">Help</a>
-        {userName && <Avatar name={userName} />}
+        {userName ? <Avatar name={userName} /> : <Link href="/sign-in" className="text-muted hover:text-ink">Sign in</Link>}
       </nav>
     </header>
   );
