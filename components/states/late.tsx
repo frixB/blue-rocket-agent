@@ -4,12 +4,15 @@ import { StatusLayout } from "@/components/blocks/status-layout";
 import { RefundNote, type StateProps } from "./shared";
 
 export function Late({ order }: StateProps) {
+  const pages = order.stages.find((s) => s.stage === "crawl")?.note?.match(/(\d[\d,]*) pages/)?.[1];
+  const step = order.stages.findIndex((s) => s.state === "active") + 1;
+  const body = `${pages ? `Your site has ${pages} pages, which is well above average, and the analysis is taking longer than usual.` : "Your site is larger than average and the analysis is taking longer than usual."} Everything is running normally${step ? `: we're at step ${step} of ${order.stages.length}` : ""}. Nothing is waiting on you.`;
   return (
     <StatusLayout
       order={order}
       tile={{ icon: Clock, tone: "warning" }}
       heading="We're past the day we promised"
-      body="Your site is larger than average and the analysis is taking longer than usual. Everything is running normally. Nothing is stuck and nothing is waiting on you."
+      body={body}
       chips={<><Chip tone="warning">⏱ Running over</Chip><Chip>● Still running, no action needed</Chip></>}
     >
       <Card>

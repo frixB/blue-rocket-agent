@@ -288,6 +288,7 @@ Grid templates may still reference a layout token (`lg:grid-cols-[1fr_var(--cont
 | `SummaryRow` | default, `emphasis` | `Summary row` | S-13 `7364:36` |
 | `Stat` | `neutral` `danger` `warning` | `Stat` | S-13 `7364:167` |
 | `TimelineStep` | `done` `active` `pending` `scheduled` `failed` | `Rail step / *` | S-13 `7364:125` |
+| `StepList` | steps with `done` `active` `pending` | `Card / what happens next` step markers | S-06 `7359:56` |
 | `CodeBlock` | string content | `Code block` | S-08 `7361:2` |
 | `EmptyState` | icon, title, body, action | `Empty state` | S-16 `7366:70` |
 
@@ -297,21 +298,62 @@ Grid templates may still reference a layout token (`lg:grid-cols-[1fr_var(--cont
 
 | Block | What it composes | Figma |
 |---|---|---|
-| `AppNav` | rocket `IconTile`, links, optional `Avatar` | `App nav bar` |
-| `StatusLayout` | claim `Banner`, status header `Card` + `Heading`, `OrderSummaryCard`, `ProgressRail` | the S-06 shell, all order states |
+| `Brand` | rocket `IconTile` + wordmark | nav and footer lockup |
+| `AppNav` | `Brand`, links, `Avatar` or "Sign in" | `App nav bar` |
+| `PortalTabs` | `Tabs` for My Reports / Billing | `Portal tabs` |
+| `PageHeader` | serif title, intro, optional action | S-16, S-17 headers |
+| `StatusLayout` | claim `Banner`, status header, `OrderSummaryCard`, `ProgressRail` | the S-06 shell, all order states |
 | `OrderSummaryCard` | `Card` + `SummaryRow` | `Card / order summary` |
 | `ProgressRail` | `Card` + `TimelineStep` + `Note` | `Card / report progress` |
 | `DeliveryPromise` | `Chip`, date from `lib/orders/sla` | `Chip / delivery promise` |
 | `FindingRow` | `Chip` + text | `Finding / critical · warn · ok` |
-| `REPORT_SECTIONS` | names, icons and contents of the four sections | landing page, S-09, S-14 |
-| `MarketingSection` | a themed band with eyebrow, `Heading`, intro | landing page sections |
-| `LandingHero` … `SiteFooter` | the landing page bands | `7203:2155` |
+| `SectionStatusList` | one line per section, complete or unavailable | `Report section card / *` (S-09) |
+| `REPORT_SECTIONS` | names, icons and contents of the four sections | landing, S-09, S-14, S-15 |
+| `ReportView` | the report: header, fix-first, glance, sections, section nav; `owner` or `shared` | S-14 `7365:2`, S-15 `7369:72` |
+| `CopyShareLink` | copies the `/share/…` link | S-14 Share button |
+| `ReportRow`, `CreditRow` | one order or credit in the list | `Report row` (S-16) |
+| `TransactionsTable` | payments and refunds table | `Card / transactions` (S-17) |
+| `ContextLayout` | dark page, orbital illustration, headline, right-hand panel | `Layout / Context and form` |
+| `OrderForm` | Form Step 1 and 2 with the S-01 URL check | `7203:2397`, `7203:2823`, `7369:2` |
+| `WaitlistDialog` | native `<dialog>`, State A → State B | `7203:3001`, `7203:3027` |
+| Auth forms | `SignInForm`, `PasswordSignInForm`, `ResetPasswordForm`, `RecoverOrderForm`, `ClaimAccountForm`, `CheckInbox` | S-05, S-07, S-18, S-18b, S-19 |
+| `SystemMessage` | dark centred message with actions | S-15b, S-21a, S-21b |
+| `MarketingSection`, `LandingHero` … `SiteFooter` | the landing page bands | `7203:2155` |
 
 ### 5.4 Reviewing components
 
 `/dev/components` renders every primitive in both themes, with the Figma layer name beside each one. `/dev/states` lists every order state. Both are hidden in production unless `NEXT_PUBLIC_SHOW_STATE_GALLERY=true`. Review token and primitive changes on the PR preview there, not in Figma.
 
-### 5.5 Getting details from a Figma screen
+### 5.5 Screens and routes
+
+Every frame in the Figma **MVP** section and where it lives. `/dev/states` links to all of them.
+
+| Route | Screen | Figma |
+|---|---|---|
+| `/` | Landing page | `7203:2155` |
+| `/order` | Form Step 1 + S-01 URL check, Form Step 2 | `7203:2397`, `7369:2`, `7203:2823` |
+| `/order/checkout` | S-02 Redirecting to Stripe | `7368:90` |
+| `/order/[id]` | S-03 Payment failed, or "finish paying" | `7358:5` |
+| `/order/duplicate/[id]` | S-04 Duplicate purchase guard | `7368:102` |
+| `/reports/[id]` | S-06, S-08, S-09, S-10, S-11, S-12, S-13, S-22, refunded | `7359:2` … `7364:2` |
+| `/reports/[id]/report` | S-14 Report detail | `7365:2` |
+| `/reports` | S-16 My Reports (populated, `?view=empty`) | `7366:2`, `7366:70` |
+| `/billing` | S-17 Billing and receipts | `7366:102` |
+| `/claim/[id]` | S-07 Claim your account | `7368:2` |
+| `/sign-in`, `/sign-in/password` | S-18, S-18b | `7368:22`, `7368:43` |
+| `/reset-password` | S-19 Password reset, link sent | `7368:65` |
+| `/recover` | S-05 Recover your order | `7358:35` |
+| `/signed-out` | S-20 Session expired | `7368:79` |
+| `/share/[token]` | S-15 Shared view, S-15b Link expired | `7369:72`, `7369:321` |
+| `/maintenance` | S-21b Maintenance | `7369:308` |
+| any unknown URL | S-21a 404 | `7369:298` |
+| landing pricing card | Waitlist State A / B | `7203:3001`, `7203:3027` |
+
+Not built, on purpose: **Confirmation** (`7203:2489`) and **Create your account** (`7236:131`). They are the original MVP frames (a 2-hour promise, sign-up before payment). S-06 and S-07 replace them, per §9.
+
+**What is still a stub.** Screens render from `lib/orders/fixtures.ts`. Stripe checkout, persistence of the intake form, auth and email (`app/actions/auth.ts` says plainly that sign-in isn't switched on), PDFs, receipts and share-link creation are not connected. The waitlist posts to `WAITLIST_WEBHOOK_URL` when set. `?preview=sent|error` shows the success and error states of the account screens on local and preview builds only (`lib/preview.ts`).
+
+### 5.6 Getting details from a Figma screen
 
 With the Figma connector enabled, an agent reads a screen with `get_design_context` on its node id (for example S-13 is `7364:2` in file `43WfRGUtWOHJa3Q7fAZFj7`). The response is React + Tailwind with Figma's own variable names and pixel values. Treat it as a reference, never as code to paste:
 
@@ -648,3 +690,4 @@ These block specific files and should be answered before the phase that needs th
 | 9 | Figma's landing page has a newsletter "Subscribe" field and a "Notify me" waitlist. There is no mailing-list backend yet, so the code links to email instead. Which provider? | footer, pricing card |
 | 10 | The unnumbered `Space` and `Radius` collections in Figma duplicate `3. Scale`. Delete them? | token build warnings |
 | 11 | The `focus/ring` effect is amber `rgba(245,165,36,.45)` from the old brand; everything else focus-related is blue. Change it to blue in Figma? | every focusable element |
+| 12 | S-22 in Figma says "reports run every day, including weekends" while its frame is titled "paid Friday, runs Monday". The code follows the SLA (Monday to Friday). Confirm, then fix the frame. | S-22, landing FAQ |

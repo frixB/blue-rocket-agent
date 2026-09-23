@@ -18,6 +18,7 @@ export { Note } from "./note";
 export { ProgressBar } from "./progress-bar";
 export { Select } from "./select";
 export { Stat } from "./stat";
+export { StepList } from "./step-list";
 export { StatusBadge, type BadgeKind } from "./status-badge";
 export { SummaryRow } from "./summary-row";
 export { Tabs } from "./tabs";
