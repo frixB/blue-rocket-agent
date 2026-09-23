@@ -1,8 +1,8 @@
 import { ChartColumn, Clock } from "lucide-react";
-import { Card, CardTitle } from "@/components/ui";
+import { Card, CardTitle, StepList } from "@/components/ui";
 import { StatusLayout } from "@/components/blocks/status-layout";
 import { DeliveryPromise } from "@/components/blocks/delivery-promise";
-import { queueReason, workStartsAt, formatDay } from "@/lib/orders/sla";
+import { formatDay, formatPrice, queueReason, workStartsAt } from "@/lib/orders/sla";
 import { RunningChip, type StateProps } from "./shared";
 
 export function Running({ order }: StateProps) {
@@ -18,11 +18,11 @@ export function Running({ order }: StateProps) {
     >
       <Card>
         <CardTitle>What happens next</CardTitle>
-        <ol className="flex flex-col gap-4 type-body-sm text-ink-2">
-          <li><strong className="text-ink">Payment confirmed.</strong> Stripe processed your payment.</li>
-          <li><strong className="text-ink">Agents are working.</strong> We analyse your site across 4 SEO areas.</li>
-          <li><strong className="text-ink">Your report lands here and in your inbox.</strong> We email {order.email} the moment it&apos;s ready. This page updates either way.</li>
-        </ol>
+        <StepList steps={[
+          { title: "Payment confirmed", body: `Your ${formatPrice(order.amountCents)} payment was processed by Stripe.`, state: "done" },
+          { title: queued ? "Agents start soon" : "AI agents are working now", body: "Our agents analyse your site across 4 SEO areas.", state: queued ? "pending" : "active" },
+          { title: "Report lands here and in your inbox", body: `We email ${order.email} the moment it's ready. This page updates either way.`, state: "pending" },
+        ]} />
       </Card>
     </StatusLayout>
   );

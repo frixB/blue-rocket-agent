@@ -3,6 +3,8 @@ import { SystemMessage } from "@/components/blocks/system-message";
 import { Icon, buttonStyles } from "@/components/ui";
 
 export const metadata = { title: "Down for maintenance · Blue Rocket Agents", robots: { index: false } };
+/** Read MAINTENANCE_BACK_BY per request, not at build time. */
+export const dynamic = "force-dynamic";
 
 /**
  * S-21b Maintenance (7369:308). Point traffic here during planned downtime.

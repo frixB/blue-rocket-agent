@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Bookmark, CircleCheck, Clock, FileText, Mail, Rocket, TriangleAlert } from "lucide-react";
 import {
   Avatar, Banner, Button, Card, CardTitle, Checkbox, Chip, CodeBlock, EmptyState, Field, Heading, Icon,
-  IconTile, Input, Modal, Note, ProgressBar, Select, Stat, StatusBadge, SummaryRow, Tabs, TimelineStep,
+  IconTile, Input, Modal, Note, ProgressBar, Select, Stat, StatusBadge, StepList, SummaryRow, Tabs, TimelineStep,
   type BadgeKind, type Tone,
 } from "@/components/ui";
 
@@ -120,6 +120,10 @@ function Gallery({ p }: { p: string }) {
             </ol>
           </Card>
         </div>
+      </Row>
+
+      <Row title="StepList" figma="Card / what happens next (S-06)">
+        <StepList steps={[{ title: "Payment confirmed", body: "Processed by Stripe.", state: "done" }, { title: "AI agents are working now", body: "Across 4 SEO areas.", state: "active" }, { title: "Report lands here", body: "And in your inbox.", state: "pending" }]} />
       </Row>
 
       <Row title="CodeBlock, EmptyState" figma="Code block (S-08), Empty state (S-16)">
