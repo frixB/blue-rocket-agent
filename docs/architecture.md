@@ -299,6 +299,7 @@ Grid templates may still reference a layout token (`lg:grid-cols-[1fr_var(--cont
 | Block | What it composes | Figma |
 |---|---|---|
 | `Brand` | rocket `IconTile` + wordmark | nav and footer lockup |
+| `SiteNav` | landing top nav: What you get, Pricing, My Reports, Sign in, Get started | not in Figma (the hero shows only the logo); added so the landing page reaches sign-in and the portal |
 | `AppNav` | `Brand`, links, `Avatar` or "Sign in" | `App nav bar` |
 | `PortalTabs` | `Tabs` for My Reports / Billing | `Portal tabs` |
 | `PageHeader` | serif title, intro, optional action | S-16, S-17 headers |
@@ -332,7 +333,7 @@ Every frame in the Figma **MVP** section and where it lives. `/dev/states` links
 |---|---|---|
 | `/` | Landing page | `7203:2155` |
 | `/order` | Form Step 1 + S-01 URL check, Form Step 2 | `7203:2397`, `7369:2`, `7203:2823` |
-| `/order/checkout` | S-02 Redirecting to Stripe | `7368:90` |
+| `/order/checkout` | S-02 Redirecting to Stripe. On local and preview builds a "Demo only" link continues to a running order, so the whole flow can be clicked through before Stripe exists | `7368:90` |
 | `/order/[id]` | S-03 Payment failed, or "finish paying" | `7358:5` |
 | `/order/duplicate/[id]` | S-04 Duplicate purchase guard | `7368:102` |
 | `/reports/[id]` | S-06, S-08, S-09, S-10, S-11, S-12, S-13, S-22, refunded | `7359:2` … `7364:2` |

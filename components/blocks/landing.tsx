@@ -3,6 +3,7 @@ import { Check, FlaskConical } from "lucide-react";
 import { Card, Chip, Heading, Icon, IconTile, buttonStyles } from "@/components/ui";
 import { SLA, formatPrice } from "@/lib/orders/sla";
 import { Brand } from "./brand";
+import { SiteNav } from "./site-nav";
 import { MarketingSection } from "./marketing-section";
 import { REPORT_SECTIONS, SECTION_ORDER } from "./report-sections";
 import { WaitlistDialog } from "./waitlist-dialog";
@@ -29,7 +30,7 @@ export function LandingHero() {
   return (
     <header className="px-5 pb-24 pt-10">
       <div className="mx-auto flex w-full max-w-report flex-col gap-16">
-        <Link href="/" aria-label="Blue Rocket Agents home" className="self-start"><Brand /></Link>
+        <SiteNav />
         <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex max-w-2xl flex-col items-start gap-6">
             <Chip tone="info">SEO clarity for local businesses</Chip>
