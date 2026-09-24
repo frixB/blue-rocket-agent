@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { TZDate } from "@date-fns/tz";
 import {
   SLA, addBusinessMinutes, businessMinutesBetween, deliveryDeadline,
-  formatDate, formatDeliveryPromise, formatDuration, queueReason, slaState,
+  formatDate, formatDeliveryPromise, formatDuration, formatPriceShort, queueReason, slaState,
 } from "./sla";
 
 // September 2026: Tue 15, Wed 16, Thu 17, Fri 18, Sat 19, Sun 20, Mon 21.
@@ -58,4 +58,9 @@ describe("formatDuration", () => {
 
 describe("formatDate", () => {
   it("uses a three-letter month", () => expect(formatDate(t(16, 12))).toBe("16 Sep 2026"));
+});
+
+describe("formatPriceShort", () => {
+  it("drops .00 for whole dollars", () => expect(formatPriceShort(150_000)).toBe("$1,500"));
+  it("keeps cents otherwise", () => expect(formatPriceShort(150_050)).toBe("$1,500.50"));
 });

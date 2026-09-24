@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ChartColumn, CircleCheck, Clock, Search, TriangleAlert, Wrench } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChartColumn, CircleCheck, Clock, Search, TriangleAlert, Wrench } from "lucide-react";
 import { Button, Chip, Field, Heading, Icon, IconTile, Input, ProgressBar, Select, type InputState } from "@/components/ui";
 import type { VerifyResult } from "@/lib/verify-url";
 
@@ -89,7 +89,7 @@ export function OrderForm({ price, productName }: { price: string; productName: 
           </Field>
         </div>
         <div className="flex flex-col items-center gap-4">
-          <Button type="submit" size="lg" full disabled={!step2Ready} loading={paying}>Pay {price} with Stripe →</Button>
+          <Button type="submit" size="lg" full disabled={!step2Ready} loading={paying}>Pay {price} with Stripe <Icon icon={ArrowRight} size="sm" /></Button>
           <Chip>Secured by Stripe · PCI DSS compliant</Chip>
           <p className="type-caption text-muted">We never store your card details. Nothing is charged until you confirm on Stripe.</p>
         </div>
@@ -152,15 +152,15 @@ export function OrderForm({ price, productName }: { price: string; productName: 
           </Field>
           <Field htmlFor="country" label="Country" hint="Sets the regional search data." required>
             <Select id="country" required value={f.country} onChange={set("country")} aria-describedby="country-hint">
-              <option value="" disabled>Choose</option>
+              <option value="" disabled>Choose a country</option>
               {COUNTRIES.map((o) => <option key={o}>{o}</option>)}
             </Select>
           </Field>
         </div>
       </div>
       <div className="flex flex-col items-center gap-3">
-        <Button type="submit" size="lg" full disabled={!step1Ready}>Continue to step 2 →</Button>
-        <p className="type-caption text-muted">Your details are encrypted and never shared with third parties.</p>
+        <Button type="submit" size="lg" full disabled={!step1Ready}>Continue to step 2 <Icon icon={ArrowRight} size="sm" /></Button>
+        <p className="type-caption text-muted">We only use these details to build your report.</p>
       </div>
     </form>
   );

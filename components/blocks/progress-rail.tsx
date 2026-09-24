@@ -11,7 +11,7 @@ export function ProgressRail({ order, now }: { order: Order; now?: Date }) {
     if (s.note && s.state !== "done") return s.note;
     switch (s.state) {
       case "done": return `Completed ${formatDay(new Date(s.at!))}${s.note ? ` \u00B7 ${s.note}` : ""}`;
-      case "active": return "\u26A1 Running now";
+      case "active": return "Running now";
       case "scheduled": return `Starts ${formatDay(start)}`;
       case "failed": return s.at ? `Stopped ${formatDay(new Date(s.at))}` : "Stopped";
       case "pending": return s.stage === "delivery" ? formatDeliveryPromise(deadline, now) : "Waiting";

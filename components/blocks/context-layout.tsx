@@ -23,7 +23,7 @@ export function ContextLayout({ title, lead, steps, children }: {
       <header className="px-nav-x py-nav-y">
         <Link href="/" aria-label="Blue Rocket Agents home"><Brand /></Link>
       </header>
-      <main className="mx-auto flex w-full max-w-report flex-col items-center justify-center gap-12 px-5 pb-16 pt-6 lg:min-h-[80dvh] lg:flex-row lg:gap-24">
+      <main id="main" className="mx-auto flex w-full max-w-report flex-col items-center justify-center gap-12 px-5 pb-16 pt-6 lg:min-h-[80dvh] lg:flex-row lg:gap-24">
         <section className="flex w-full max-w-md flex-col gap-6">
           <img src="/figma/orbital.svg" alt="" aria-hidden className="hidden h-auto w-90 max-w-full sm:block" />
           <Heading variant="display">{title}</Heading>

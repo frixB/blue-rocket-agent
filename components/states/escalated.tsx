@@ -1,4 +1,4 @@
-import { Mail } from "lucide-react";
+import { Mail, TriangleAlert, User } from "lucide-react";
 import { Avatar, Card, CardTitle, Chip, buttonStyles } from "@/components/ui";
 import { StatusLayout } from "@/components/blocks/status-layout";
 import { RefundNote, type StateProps } from "./shared";
@@ -12,7 +12,7 @@ export function Escalated({ order }: StateProps) {
       tile={{ icon: Mail, tone: "danger" }}
       heading="This has taken far too long"
       body="Your report has run a full business day past what we promised. We've stopped giving you estimates because ours have clearly been wrong."
-      chips={<><Chip tone="danger">⚠ Overdue</Chip><Chip tone="warning">● Escalated to a human</Chip></>}
+      chips={<><Chip tone="danger" icon={TriangleAlert}>Overdue</Chip><Chip tone="warning" icon={User}>Escalated to a person</Chip></>}
     >
       <Card>
         <RefundNote order={order} lead="Your $1,500 has been refunded in full, automatically. You didn't have to ask. Issued" />

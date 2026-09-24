@@ -1,3 +1,4 @@
+import { CircleDot } from "lucide-react";
 import { Chip, Note } from "@/components/ui";
 import { formatDay } from "@/lib/orders/sla";
 import type { Order } from "@/lib/orders/types";
@@ -13,4 +14,4 @@ export function RefundNote({ order, lead }: { order: Order; lead?: string }) {
   );
 }
 
-export const RunningChip = () => <Chip tone="success"><span aria-hidden>●</span> Running now</Chip>;
+export const RunningChip = () => <Chip tone="success" icon={CircleDot}>Running now</Chip>;

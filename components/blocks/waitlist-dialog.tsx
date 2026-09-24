@@ -18,7 +18,7 @@ export function WaitlistDialog({ triggerLabel = "Notify me when available" }: { 
       <dialog ref={ref} aria-labelledby="waitlist-title" data-theme="app"
         className="m-auto w-[calc(100%-2rem)] max-w-modal-md rounded-modal bg-raised p-modal text-ink shadow-overlay backdrop:bg-inverse/70">
         <div className="flex flex-col items-center gap-6 text-center">
-          <button type="button" aria-label="Close" onClick={() => ref.current?.close()} className="self-end rounded-full bg-sunken p-2 text-muted hover:text-ink">
+          <button type="button" aria-label="Close" onClick={() => ref.current?.close()} className="flex size-11 items-center justify-center self-end rounded-full bg-sunken text-muted hover:text-ink">
             <Icon icon={X} size="sm" />
           </button>
           {done ? (

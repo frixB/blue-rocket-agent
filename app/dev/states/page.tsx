@@ -52,7 +52,7 @@ function Tile({ href, title, sub }: { href: string; title: string; sub: string }
 export default function StateGallery() {
   if (process.env.NEXT_PUBLIC_SHOW_STATE_GALLERY !== "true" && process.env.NODE_ENV === "production") notFound();
   return (
-    <main data-theme="app" className="mx-auto flex min-h-dvh max-w-app flex-col gap-6 bg-page px-5 py-16 text-ink">
+    <main id="main" data-theme="app" className="mx-auto flex min-h-dvh max-w-app flex-col gap-6 bg-page px-5 py-16 text-ink">
       <h1 className="type-bra-heading-1">Order states</h1>
       <p className="type-body text-ink-2">Every state a paying customer can land on. Review these on the PR preview instead of in Figma.</p>
       <ul className="grid gap-3 sm:grid-cols-2">

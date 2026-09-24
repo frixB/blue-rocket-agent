@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { Mail, Rocket } from "lucide-react";
-import { Banner, Button, EmptyState, buttonStyles } from "@/components/ui";
+import { Mail, Plus, Rocket } from "lucide-react";
+import { Banner, EmptyState, Icon, buttonStyles } from "@/components/ui";
+import { supportHref } from "@/lib/support";
 import { PageHeader } from "@/components/blocks/page-header";
 import { PortalTabs } from "@/components/blocks/portal-tabs";
 import { CreditRow, ReportRow } from "@/components/blocks/report-row";
 import { getAccount, listOrders } from "@/lib/orders/fixtures";
-import { SLA, formatPrice } from "@/lib/orders/sla";
+import { SLA, formatPriceShort } from "@/lib/orders/sla";
 
 /**
  * S-16 My Reports: populated (7366:2) and empty (7366:70).
@@ -19,12 +20,12 @@ export default async function MyReports({ searchParams }: { searchParams: Promis
   return (
     <>
       <PortalTabs />
-      <main className="mx-auto flex w-full max-w-app flex-col gap-5 px-5 pb-page-bottom pt-12">
+      <main id="main" className="mx-auto flex w-full max-w-app flex-col gap-5 px-5 pb-page-bottom pt-12">
         <PageHeader title="My Reports"
           intro={orders.length ? "Every report you have bought, newest first." : "Every report you buy will live here."}
-          action={orders.length ? <Link href="/order" className={buttonStyles()}>+ New report</Link> : undefined} />
+          action={orders.length ? <Link href="/order" className={buttonStyles()}><Icon icon={Plus} size="sm" /> New report</Link> : undefined} />
         {orders.length > 0 && !account.emailVerified && (
-          <Banner inset icon={Mail} actions={<Button variant="text" className="type-body-sm-strong text-warning-ink">Resend email</Button>}>
+          <Banner inset icon={Mail} actions={<a href={supportHref("Please resend my verification email")} className="inline-block py-3 type-body-sm-strong text-warning-ink underline-offset-2 hover:underline">Resend email</a>}>
             Verify your email so we can deliver reports to you. Check {account.email}.
           </Banner>
         )}
@@ -35,7 +36,7 @@ export default async function MyReports({ searchParams }: { searchParams: Promis
           </ul>
         ) : (
           <EmptyState icon={Rocket} title="No reports yet"
-            body={`Your first SEO report is delivered within one business day. Flat ${formatPrice(SLA.priceCents)}, no subscription, full refund if we can't audit your site.`}
+            body={`Your first SEO report is delivered within one business day. Flat ${formatPriceShort(SLA.priceCents)}, no subscription, full refund if we can't audit your site.`}
             action={<Link href="/order" className={buttonStyles()}>Get your first report</Link>} />
         )}
       </main>

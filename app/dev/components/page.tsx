@@ -138,7 +138,7 @@ export default function ComponentGallery() {
   if (process.env.NEXT_PUBLIC_SHOW_STATE_GALLERY !== "true" && process.env.NODE_ENV === "production") notFound();
   return (
     <div className="flex flex-col">
-      <main data-theme="app" className="bg-page px-5 py-16 text-ink">
+      <main id="main" data-theme="app" className="bg-page px-5 py-16 text-ink">
         <div className="mx-auto flex max-w-app flex-col gap-8">
           <header className="flex flex-col gap-2">
             <Heading>Components</Heading>

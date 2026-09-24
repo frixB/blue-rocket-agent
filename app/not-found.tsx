@@ -7,7 +7,7 @@ import { buttonStyles } from "@/components/ui";
 export default function NotFound() {
   return (
     <SystemMessage icon={Rocket} title="This page has drifted off course"
-      body="The link may be broken, or the page may have moved. Your reports are all still in your dashboard.">
+      body="The link may be broken, or the page may have moved. Your reports are all still in My Reports.">
       <Link href="/reports" className={buttonStyles()}>Go to my reports</Link>
       <Link href="/" className={buttonStyles({ variant: "darkghost" })}>Back to home</Link>
     </SystemMessage>

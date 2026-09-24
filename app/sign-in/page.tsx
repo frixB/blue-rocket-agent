@@ -10,7 +10,7 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<{
   return (
     <div data-theme="app" className="flex min-h-dvh flex-col bg-page text-ink">
       <header className="px-nav-x py-nav-y"><Link href="/" aria-label="Blue Rocket Agents home"><Brand /></Link></header>
-      <main className="flex flex-1 items-center justify-center px-5 pb-16">
+      <main id="main" className="flex flex-1 items-center justify-center px-5 pb-16">
         <div className="grid w-full max-w-3xl overflow-hidden rounded-modal bg-raised shadow-overlay md:grid-cols-[2fr_3fr]">
           <section className="flex flex-col gap-6 bg-info px-8 py-12">
             <Heading as="p" variant="display" className="text-info-ink">Your next move starts here.</Heading>

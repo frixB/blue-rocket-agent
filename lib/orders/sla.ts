@@ -117,6 +117,9 @@ export const formatTime = (d: Date) => format(zoned(d), "HH:mm");
 export const formatDay = (d: Date) => format(zoned(d), "EEE HH:mm");
 /** "16 Sep 2026", for lists and receipts. */
 export const formatDate = (d: Date) => format(zoned(d), "dd MMM yyyy");
+/** "$1,500" for headlines, CTAs and sentences; formatPrice keeps cents for receipts and summaries. */
+export const formatPriceShort = (cents: number) =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: cents % 100 ? 2 : 0 }).format(cents / 100);
 export const formatPrice = (cents: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 

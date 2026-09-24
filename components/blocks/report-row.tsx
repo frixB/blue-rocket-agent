@@ -41,13 +41,17 @@ function RowShell({ orderId, tile, title, subtitle, badge, meta, children }: {
       <Link href={`/reports/${orderId}`} className="flex items-center gap-4 rounded-xl border border-hairline bg-raised px-5 py-4.5 transition-shadow hover:shadow-raised">
         {tile}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <span className="truncate type-body-lg font-semibold text-ink">{title}</span>
-          <span className="truncate type-body-sm text-muted">{subtitle}</span>
+          <span className="break-words type-body-lg font-semibold text-ink">{title}</span>
+          <span className="break-words type-body-sm text-muted">{subtitle}</span>
           {children}
+          <div className="mt-1 flex flex-wrap items-center gap-2 sm:hidden">
+            {badge}
+            <span className="type-caption text-muted">{meta}</span>
+          </div>
         </div>
-        <div className="flex shrink-0 flex-col items-end gap-1.5 text-right">
+        <div className="hidden shrink-0 flex-col items-end gap-1.5 text-right sm:flex">
           {badge}
-          <span className="hidden type-caption text-muted sm:block">{meta}</span>
+          <span className="type-caption text-muted">{meta}</span>
         </div>
         <Icon icon={ChevronRight} className="text-muted" />
       </Link>
