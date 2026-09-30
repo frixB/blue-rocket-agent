@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Bookmark, Lock, Mail, Search } from "lucide-react";
 import { Button, Field, Heading, IconTile, Input, Note, buttonStyles } from "@/components/ui";
 import {
-  claimAccount, recoverOrder, requestPasswordReset, requestSignInLink, signInWithPassword, type AuthResult,
+  claimAccount, recoverOrder, requestPasswordReset, requestSignInLink, setNewPassword, signInWithPassword, type AuthResult,
 } from "@/app/actions/auth";
 import { passwordStrength } from "@/lib/password-strength";
 
@@ -18,7 +18,7 @@ const errorFor = (s: AuthResult | null, field: "email" | "password") => (s && !s
 const formError = (s: AuthResult | null) => (s && !s.ok && !s.field ? s.error : undefined);
 
 /** S-19 (7368:65): the "check your inbox" panel every email-link flow ends on. */
-export function CheckInbox({ email, body, onResend }: { email: string; body: string; onResend: () => void }) {
+export function CheckInbox({ email, body, devLink, onResend }: { email: string; body: string; devLink?: string; onResend: () => void }) {
   return (
     <>
       <IconTile icon={Mail} tone="success" size="lg" />
@@ -27,25 +27,33 @@ export function CheckInbox({ email, body, onResend }: { email: string; body: str
         <p className="type-body text-ink-2">{body}</p>
       </div>
       <Note icon={Mail}>We sent it to {email}</Note>
-      <a href="mailto:" className={buttonStyles({ full: true })}>Open email app</a>
+      {devLink ? (
+        <>
+          <Note tone="warning">Local development: emails aren&apos;t sent, so the link is here instead.</Note>
+          <a href={devLink} className={buttonStyles({ full: true })}>Open the sign-in link</a>
+        </>
+      ) : (
+        <a href="mailto:" className={buttonStyles({ full: true })}>Open email app</a>
+      )}
       <Button variant="text" full onClick={onResend}>Didn&apos;t get it? Check your spam folder, or send it again</Button>
     </>
   );
 }
 
 /** Header, email field and footer until the action succeeds; then the whole panel becomes S-19. */
-function EmailFlow({ action, submit, preview, sentBody, header, footer }: {
-  action: Action; submit: string; preview: Preview; sentBody: string; header: React.ReactNode; footer?: React.ReactNode;
+function EmailFlow({ action, submit, preview, sentBody, header, footer, next }: {
+  action: Action; submit: string; preview: Preview; sentBody: string; header: React.ReactNode; footer?: React.ReactNode; next?: string;
 }) {
   const [state, run, pending] = useActionState(action, null);
   const [reset, setReset] = useState(false);
   const sent = !reset && (state?.ok ? state.email : preview === "sent" ? PREVIEW_EMAIL : null);
-  if (sent) return <CheckInbox email={sent} body={sentBody} onResend={() => setReset(true)} />;
+  if (sent) return <CheckInbox email={sent} body={sentBody} devLink={state?.ok ? state.devLink : undefined} onResend={() => setReset(true)} />;
   const err = errorFor(state, "email");
   return (
     <>
       {header}
       <form action={(f) => { setReset(false); run(f); }} className="flex flex-col gap-5">
+        {next && <input type="hidden" name="next" value={next} />}
         <Field htmlFor="email" label="Email address" message={err ? { tone: "danger", text: err } : undefined}>
           <Input id="email" name="email" type="email" autoComplete="email" required placeholder="you@yourbusiness.com"
             state={err ? "error" : "default"} aria-describedby="email-msg" />
@@ -59,10 +67,10 @@ function EmailFlow({ action, submit, preview, sentBody, header, footer }: {
 }
 
 /** S-18 (7368:22): magic link first, password second, recovery last. */
-export function SignInForm({ preview }: { preview: Preview }) {
+export function SignInForm({ preview, next }: { preview: Preview; next?: string }) {
   return (
     <div className="flex flex-col gap-5">
-      <EmailFlow action={requestSignInLink} submit="Email me a sign-in link" preview={preview}
+      <EmailFlow action={requestSignInLink} submit="Email me a sign-in link" preview={preview} next={next}
         sentBody="If an account exists for that email, a sign-in link is on its way. The link works for 60 minutes."
         header={
           <div className="flex flex-col gap-2.5">
@@ -73,7 +81,7 @@ export function SignInForm({ preview }: { preview: Preview }) {
         footer={
           <>
             <div className="flex items-center gap-3 type-caption text-muted" aria-hidden><span className="h-px flex-1 bg-hairline" />or<span className="h-px flex-1 bg-hairline" /></div>
-            <Link href="/sign-in/password" className={buttonStyles({ variant: "ghost", full: true })}>Sign in with a password</Link>
+            <Link href={next ? { pathname: "/sign-in/password", query: { callbackUrl: next } } : "/sign-in/password"} className={buttonStyles({ variant: "ghost", full: true })}>Sign in with a password</Link>
             <Link href="/recover" className={buttonStyles({ variant: "text", full: true })}>Paid but never made an account? Recover your order</Link>
           </>
         } />
@@ -82,7 +90,7 @@ export function SignInForm({ preview }: { preview: Preview }) {
 }
 
 /** S-18b (7368:43): the password form, and its wrong-password state. */
-export function PasswordSignInForm({ preview }: { preview: Preview }) {
+export function PasswordSignInForm({ preview, next }: { preview: Preview; next?: string }) {
   const [state, run, pending] = useActionState(signInWithPassword, null);
   const wrong = preview === "error" || Boolean(formError(state)) || Boolean(errorFor(state, "password"));
   const pwErr = preview === "error" ? "Email or password is incorrect." : errorFor(state, "password");
@@ -97,6 +105,7 @@ export function PasswordSignInForm({ preview }: { preview: Preview }) {
         </p>
       </div>
       <form action={run} className="flex flex-col gap-5">
+        {next && <input type="hidden" name="next" value={next} />}
         <Field htmlFor="email" label="Email address" message={emErr ? { tone: "danger", text: emErr } : undefined}>
           <Input id="email" name="email" type="email" autoComplete="email" required defaultValue={preview === "error" ? PREVIEW_EMAIL : undefined}
             state={emErr ? "error" : "default"} aria-describedby="email-msg" />
@@ -148,32 +157,53 @@ export function RecoverOrderForm({ preview }: { preview: Preview }) {
   );
 }
 
-/** S-07 (7368:2): set a password on the account created at checkout. */
-export function ClaimAccountForm({ email, orderId }: { email: string; orderId: string }) {
-  const [state, run, pending] = useActionState(claimAccount, null);
+/**
+ * S-07 (7368:2) and the set-password screen a reset link lands on.
+ * `confirm` is the first step when nobody is signed in: we email a link to
+ * the order's address, because setting a password must prove who you are.
+ */
+export function ClaimAccountForm({ email, orderId, mode = "claim" }: { email: string; orderId?: string; mode?: "claim" | "confirm" | "reset" }) {
+  const [state, run, pending] = useActionState(mode === "reset" ? setNewPassword : claimAccount, null);
+  const [reset, setReset] = useState(false);
   const [pw, setPw] = useState("");
   const strength = passwordStrength(pw);
   const err = errorFor(state, "password");
+  if (!reset && state?.ok) {
+    return <CheckInbox email={state.email} devLink={state.devLink} onResend={() => setReset(true)}
+      body="Open the link we sent to confirm it's you. It brings you straight back here to choose your password." />;
+  }
+  const choosing = mode !== "confirm";
   return (
     <>
-      <IconTile icon={Bookmark} tone="warning" size="lg" />
+      <IconTile icon={mode === "reset" ? Lock : Bookmark} tone={mode === "reset" ? "info" : "warning"} size="lg" />
       <div className="flex flex-col gap-2.5">
-        <Heading as="h2">Save your report</Heading>
-        <p className="type-body text-ink-2">Set a password and your report stays in My Reports for good. Anything you buy later lands in the same place.</p>
+        <Heading as="h2">{mode === "reset" ? "Choose a new password" : "Save your report"}</Heading>
+        <p className="type-body text-ink-2">
+          {mode === "reset"
+            ? "You're signed in. Choose a new password for next time."
+            : mode === "confirm"
+              ? "Set a password and your report stays in My Reports for good. First, we'll email you a link to confirm it's you."
+              : "Set a password and your report stays in My Reports for good. Anything you buy later lands in the same place."}
+        </p>
       </div>
-      <form action={run} className="flex flex-col gap-5">
+      <form action={(f) => { setReset(false); run(f); }} className="flex flex-col gap-5">
+        {orderId && <input type="hidden" name="orderId" value={orderId} />}
         <Field htmlFor="email" label="Email">
           <Input id="email" type="email" value={email} readOnly className="bg-inset" aria-readonly />
         </Field>
-        <Field htmlFor="password" label="Choose a password"
-          message={err ? { tone: "danger", text: err } : pw ? { tone: strength === "Strong" ? "success" : strength === "Fair" ? "neutral" : "warning", text: `Password strength: ${strength}` } : undefined}>
-          <Input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} placeholder="At least 8 characters"
-            value={pw} onChange={(e) => setPw(e.target.value)} state={err ? "error" : "default"} aria-describedby="password-msg" />
-        </Field>
+        {choosing && (
+          <Field htmlFor="password" label={mode === "reset" ? "New password" : "Choose a password"}
+            message={err ? { tone: "danger", text: err } : pw ? { tone: strength === "Strong" ? "success" : strength === "Fair" ? "neutral" : "warning", text: `Password strength: ${strength}` } : undefined}>
+            <Input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} placeholder="At least 8 characters"
+              value={pw} onChange={(e) => setPw(e.target.value)} state={err ? "error" : "default"} aria-describedby="password-msg" />
+          </Field>
+        )}
         {formError(state) && <Note tone="warning">{formError(state)}</Note>}
-        <Button type="submit" size="lg" full loading={pending}>Save my report</Button>
+        <Button type="submit" size="lg" full loading={pending}>
+          {mode === "reset" ? "Save my new password" : choosing ? "Save my report" : "Email me a link to confirm"}
+        </Button>
       </form>
-      <Link href={`/reports/${orderId}`} className={buttonStyles({ variant: "text", full: true })}>Not now, just email it to me</Link>
+      {orderId && <Link href={`/reports/${orderId}`} className={buttonStyles({ variant: "text", full: true })}>Not now, just email it to me</Link>}
     </>
   );
 }

@@ -12,9 +12,11 @@
     "test": "vitest run",
     "tokens:build": "node design-tokens/build.mjs",
     "tokens:pull": "node design-tokens/pull.mjs && node design-tokens/build.mjs",
-    "check": "npm run tokens:build && npm run typecheck && npm run lint && npm run test"
+    "check": "npm run tokens:build && npm run typecheck && npm run lint && npm run test",
+    "db:setup": "node scripts/db-setup.mjs"
   },
   "dependencies": {
+    "@auth/pg-adapter": "^1.11.3",
     "@date-fns/tz": "^1.5.0",
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
@@ -24,6 +26,8 @@
     "date-fns": "^4.4.0",
     "lucide-react": "^1.47.0",
     "next": "^16.3.5",
+    "next-auth": "^5.0.0-beta.32",
+    "pg": "^8.23.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "tailwind-merge": "^3.7.0"
@@ -31,6 +35,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.6.2",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "eslint": "^9.39.5",
