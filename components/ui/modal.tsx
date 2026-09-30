@@ -12,7 +12,7 @@ export function Modal({ size = "xl", className, ...props }: React.HTMLAttributes
   return (
     <section
       data-theme="app"
-      className={cn("flex w-full flex-col gap-modal-gap rounded-modal bg-raised p-modal text-ink shadow-overlay", sizes[size], className)}
+      className={cn("flex w-full flex-col gap-modal-gap rounded-card border border-hairline bg-raised p-modal text-ink shadow-popover", sizes[size], className)}
       {...props}
     />
   );

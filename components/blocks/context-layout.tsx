@@ -23,14 +23,14 @@ export function ContextLayout({ title, lead, steps, children }: {
       <header className="px-nav-x py-nav-y">
         <Link href="/" aria-label="Blue Rocket Agents home"><Brand /></Link>
       </header>
-      <main id="main" className="mx-auto flex w-full max-w-report flex-col items-center justify-center gap-12 px-5 pb-16 pt-6 lg:min-h-[80dvh] lg:flex-row lg:gap-24">
-        <section className="flex w-full max-w-md flex-col gap-6">
+      <main id="main" className="mx-auto flex w-full max-w-report flex-col items-center justify-center gap-9 px-5 pb-14 pt-5 lg:min-h-[80dvh] lg:flex-row lg:gap-24 lg:pb-16 lg:pt-6">
+        <section className="flex w-full max-w-md flex-col gap-5">
           <img src="/figma/orbital.svg" alt="" aria-hidden className="hidden h-auto w-90 max-w-full sm:block" />
-          <Heading variant="display">{title}</Heading>
+          <Heading variant="display" className="type-bra-display-responsive">{title}</Heading>
           {lead && <p className="type-lead text-ink-2">{lead}</p>}
           {steps && (
-            <ol className="flex flex-col gap-4 type-body-lg text-ink-2">
-              {steps.map((s, i) => <li key={s} className="flex gap-4"><span className="tabular-nums">{String(i + 1).padStart(2, "0")}</span>{s}</li>)}
+            <ol className="grid gap-2 type-body text-ink-2 sm:gap-3">
+              {steps.map((s, i) => <li key={s} className="flex gap-3"><span className="tabular-nums text-muted">{String(i + 1).padStart(2, "0")}</span>{s}</li>)}
             </ol>
           )}
         </section>
@@ -39,4 +39,3 @@ export function ContextLayout({ title, lead, steps, children }: {
     </div>
   );
 }
-

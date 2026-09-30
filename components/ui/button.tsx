@@ -26,12 +26,12 @@ export const buttonStyles = cva(
       },
       full: { true: "w-full" },
     },
-    compoundVariants: [{ variant: "text", class: "min-h-0 px-0 py-2" }],
+    compoundVariants: [{ variant: "text", class: "min-h-0 px-0 py-2 pointer-coarse:min-h-11" }],
     defaultVariants: { variant: "primary", size: "md" },
   },
 );
 
-type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<typeof buttonStyles> & { loading?: boolean };
+type Props = React.ComponentProps<"button"> & VariantProps<typeof buttonStyles> & { loading?: boolean };
 
 export function Button({ className, variant, size, full, loading, children, disabled, type = "button", ...props }: Props) {
   return (

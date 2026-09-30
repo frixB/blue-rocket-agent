@@ -38,7 +38,7 @@ function RowShell({ orderId, tile, title, subtitle, badge, meta, children }: {
 }) {
   return (
     <li>
-      <Link href={`/reports/${orderId}`} className="flex items-center gap-4 rounded-xl border border-hairline bg-raised px-5 py-4.5 transition-shadow hover:shadow-raised">
+      <Link href={`/reports/${orderId}`} className="flex items-center gap-4 rounded-card border border-hairline bg-raised px-5 py-4 transition-colors hover:bg-sunken">
         {tile}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <span className="break-words type-body-lg font-semibold text-ink">{title}</span>

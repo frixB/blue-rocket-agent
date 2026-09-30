@@ -12,7 +12,7 @@ const variants = {
   h3: "type-bra-heading-3",
 } as const;
 
-type Props = React.HTMLAttributes<HTMLHeadingElement> & { variant?: keyof typeof variants; as?: "h1" | "h2" | "h3" | "p" };
+type Props = React.ComponentProps<"h1"> & { variant?: keyof typeof variants; as?: "h1" | "h2" | "h3" | "p" };
 
 export function Heading({ variant = "h1", as: Tag = "h1", className, ...props }: Props) {
   return <Tag className={cn(variants[variant], "text-ink", className)} {...props} />;

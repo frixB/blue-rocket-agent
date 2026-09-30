@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, FileText, FlaskConical, Timer } from "lucide-react";
+import { ArrowRight, Check, FileText, FlaskConical, Timer } from "lucide-react";
 import { Card, Chip, Heading, Icon, IconTile, buttonStyles } from "@/components/ui";
 import { SLA, formatPriceShort } from "@/lib/orders/sla";
 import { Brand } from "./brand";
@@ -27,41 +27,47 @@ function CheckItem({ children }: { children: React.ReactNode }) {
 
 export function LandingHero() {
   return (
-    <section aria-label="Introduction" className="px-5 pb-24 pt-12">
-      <div className="mx-auto flex w-full max-w-report flex-col gap-16">
-        <div className="flex flex-col items-start gap-12 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex max-w-2xl flex-col items-start gap-6">
-            <Chip tone="info">SEO clarity for local businesses</Chip>
-            <Heading variant="display">
-              Know exactly why your business isn&apos;t showing up <span className="text-info-ink">on Google</span>
-            </Heading>
-            <p className="type-lead text-ink-2">
-              Understand what is holding your website back with a focused SEO report for a flat {price}. Clear priorities. Practical next steps. No subscription.
-            </p>
-            <Link href="/order" className={buttonStyles({ size: "lg" })}>Get started, {price}</Link>
-            <ul className="flex flex-wrap gap-2" aria-label="What you can count on">
-              <li><Chip icon={Check}>Flat fee, no surprises</Chip></li>
-              <li><Chip icon={Timer}>Delivered within {SLA.businessDays} business day</Chip></li>
-              <li><Chip icon={FileText}>Clear, prioritised report</Chip></li>
-            </ul>
+    <section aria-label="Introduction" className="relative isolate overflow-hidden px-5 pb-0 pt-14 sm:pt-18 lg:pt-20">
+      <div className="hero-starfield pointer-events-none absolute inset-0 -z-20" aria-hidden />
+      <div className="mx-auto flex w-full max-w-report flex-col items-center text-center">
+        <div className="flex max-w-[56rem] flex-col items-center gap-6">
+          <Heading variant="display" className="type-bra-display-responsive max-w-[54rem] text-balance">
+            See what&apos;s keeping your business <span className="text-info-ink">out of orbit on Google</span>
+          </Heading>
+          <p className="max-w-[42rem] type-lead text-ink-2">
+            A focused SEO report that turns hidden problems into a clear plan—for a flat {price}, with no subscription.
+          </p>
+          <div className="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
+            <Link href="/order" className={`${buttonStyles({ size: "lg" })} landing-primary`}>Get my SEO report <Icon icon={ArrowRight} size="sm" /></Link>
+            <a href="#sample" className={buttonStyles({ variant: "darkghost", size: "lg" })}>See a sample finding</a>
           </div>
-          <Card className="w-full shrink-0 lg:max-w-rail">
-            <p className="type-overline uppercase text-muted">What&apos;s in your report</p>
-            <ol className="flex flex-col gap-4">
-              {SECTION_ORDER.map((key, i) => {
-                const s = REPORT_SECTIONS[key];
-                return (
-                  <li key={key} className="flex items-center gap-3.5">
-                    <IconTile icon={s.icon} tone="info" size="sm" />
-                    <span className="flex flex-col">
-                      <span className="type-caption text-muted">Section {String(i + 1).padStart(2, "0")}</span>
-                      <span className="type-body-strong text-ink">{s.name}</span>
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
-          </Card>
+          <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2 type-caption text-ink-2" aria-label="What you can count on">
+            <li className="flex items-center gap-1.5"><Icon icon={Check} size="sm" className="text-success-accent" /> Flat {price} fee</li>
+            <li className="flex items-center gap-1.5"><Icon icon={Timer} size="sm" className="text-success-accent" /> Within {SLA.businessDays} business day</li>
+            <li className="flex items-center gap-1.5"><Icon icon={FileText} size="sm" className="text-success-accent" /> Prioritised next steps</li>
+          </ul>
+        </div>
+
+        <div className="relative mt-8 h-[25rem] w-full max-w-[64rem] overflow-hidden sm:mt-10 sm:h-[32rem]" aria-label="The four areas covered by the SEO report">
+          <div className="hero-orbit hero-orbit-far" aria-hidden />
+          <div className="hero-orbit hero-orbit-near" aria-hidden />
+          <div className="hero-planet" aria-hidden>
+            <div className="hero-planet-grid" />
+          </div>
+          <ol className="absolute inset-0">
+            {SECTION_ORDER.map((key, i) => {
+              const s = REPORT_SECTIONS[key];
+              return (
+                <li key={key} className={`hero-signal hero-signal-${i + 1}`}>
+                  <IconTile icon={s.icon} tone="info" size="sm" />
+                  <span className="min-w-0 text-left">
+                    <span className="block type-caption text-muted">0{i + 1}</span>
+                    <span className="block whitespace-nowrap type-body-strong text-ink">{s.name}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </div>
     </section>
@@ -70,27 +76,29 @@ export function LandingHero() {
 
 export function LandingIncluded() {
   return (
-    <MarketingSection id="included" eyebrow="Explore the report" title="Everything you need to know"
-      intro="A full picture of your SEO health, delivered as a clear, actionable PDF.">
-      <nav aria-label="On this page" className="flex flex-wrap justify-center gap-2">
-        <a href="#included" className={buttonStyles({ variant: "ghost", size: "sm" })}>What do I get?</a>
-        <a href="#sample" className={buttonStyles({ variant: "ghost", size: "sm" })}>Show me an example</a>
-        <a href="#faq" className={buttonStyles({ variant: "ghost", size: "sm" })}>FAQ</a>
-      </nav>
-      <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <MarketingSection id="included" title="Four parts. One clear plan."
+      intro="We examine the foundations, the pages, the signals beyond your site and the competitors around you.">
+      <div className="report-scope-grid mx-auto grid w-full max-w-wide md:grid-cols-2">
         {SECTION_ORDER.map((key) => {
           const s = REPORT_SECTIONS[key];
           return (
-            <li key={key}>
-              <Card className="h-full bg-sunken">
-                <IconTile icon={s.icon} tone="info" />
-                <h3 className="type-heading-h4 text-ink">{s.name}</h3>
-                <ul className="flex flex-col gap-1.5">{s.includes.map((x) => <CheckItem key={x}>{x}</CheckItem>)}</ul>
-              </Card>
-            </li>
+            <details key={key} className="report-scope-item group">
+              <summary className="flex min-h-control-md cursor-pointer list-none items-center gap-3 rounded-xl px-4 py-5 transition-colors hover:bg-sunken">
+                <IconTile icon={s.icon} tone="info" size="sm" />
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="type-heading-h4 text-ink">{s.name}</span>
+                  <span className="type-caption text-muted">{s.includes.length} focused checks · View details</span>
+                </span>
+                <span aria-hidden className="type-heading-h4 text-action transition-transform duration-300 group-open:rotate-45">+</span>
+              </summary>
+              <ul className="report-scope-content mx-4 mb-5 flex flex-col gap-1.5 border-t border-hairline pb-1 pt-4 sm:pl-11">{s.includes.map((x) => <CheckItem key={x}>{x}</CheckItem>)}</ul>
+            </details>
           );
         })}
-      </ul>
+      </div>
+      <div className="flex justify-center">
+        <a href="#sample" className={buttonStyles({ variant: "ghost", size: "sm" })}>See how findings become next steps</a>
+      </div>
     </MarketingSection>
   );
 }
@@ -102,16 +110,23 @@ const SAMPLE = [
 
 export function LandingSample() {
   return (
-    <MarketingSection id="sample" tint title="See what an actionable report looks like"
+    <MarketingSection id="sample" theme="marketing" className="sample-section relative overflow-hidden" title="From finding to next step"
       intro="Illustrative preview. Sample findings, not results from a customer audit.">
-      <ol className="mx-auto flex w-full max-w-main flex-col gap-3">
+      <ol className="sample-findings mx-auto w-full max-w-wide border-y border-hairline">
         {SAMPLE.map((f, i) => (
-          <li key={f.issue}>
-            <Card compact className="gap-2">
-              <p className="type-overline uppercase text-action">{String(i + 1).padStart(2, "0")} · {f.priority} · {f.area}</p>
-              <p className="type-body-strong text-ink">{f.issue}</p>
-              <p className="type-body-sm text-ink-2">Next step: {f.next}</p>
-            </Card>
+          <li key={f.issue} className="sample-finding grid gap-4 border-b border-hairline px-3 py-7 last:border-b-0 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-center md:gap-8 md:px-5">
+            <div className="flex min-w-0 gap-4">
+              <span className="type-bra-heading-2 text-action">{String(i + 1).padStart(2, "0")}</span>
+              <div className="flex min-w-0 flex-col gap-1">
+                <p className="type-overline uppercase text-action">{f.priority} · {f.area}</p>
+                <p className="type-body-strong text-ink">{f.issue}</p>
+              </div>
+            </div>
+            <Icon icon={ArrowRight} className="sample-finding-arrow hidden text-muted md:block" />
+            <div className="flex flex-col gap-1 pl-12 md:pl-0">
+              <p className="type-caption-strong text-muted">Recommended next step</p>
+              <p className="type-body-sm text-ink-2">{f.next}</p>
+            </div>
           </li>
         ))}
       </ol>
@@ -137,18 +152,18 @@ const FAQ = [
 export function LandingHowItWorks() {
   return (
     <MarketingSection id="faq" title="From your website to your next move">
-      <ol className="grid gap-5 md:grid-cols-3">
+      <ol className="process-path grid gap-5 md:grid-cols-3">
         {STEPS.map((s, i) => (
-          <li key={s.title} className="flex flex-col gap-2">
-            <span className="type-overline text-action">{String(i + 1).padStart(2, "0")}</span>
+          <li key={s.title} className="process-step relative flex flex-col gap-2 rounded-card px-5 py-6">
+            <span className="process-marker flex size-10 items-center justify-center rounded-full border border-hairline bg-raised type-caption-strong text-action">{String(i + 1).padStart(2, "0")}</span>
             <h3 className="type-heading-h4 text-ink">{s.title}</h3>
             <p className="type-body text-ink-2">{s.body}</p>
           </li>
         ))}
       </ol>
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-6 border-t border-hairline pt-10">
         <Heading as="h3" variant="h2">Before you get started</Heading>
-        <dl className="grid gap-5 md:grid-cols-3">
+        <dl className="faq-grid grid gap-x-8 gap-y-7 md:grid-cols-3">
           {FAQ.map((f) => (
             <div key={f.q} className="flex flex-col gap-1.5">
               <dt className="type-body-strong text-ink">{f.q}</dt>
@@ -163,22 +178,22 @@ export function LandingHowItWorks() {
 
 export function LandingPricing() {
   return (
-    <MarketingSection id="pricing" tint eyebrow="Available now" title="Choose your report"
-      intro="Start with our flagship SEO audit. More specialised reports are coming soon.">
-      <div className="mx-auto grid w-full max-w-wide gap-5 md:grid-cols-2">
-        <Card className="shadow-raised">
+    <MarketingSection id="pricing" tint title="Get your SEO report"
+      intro="One focused audit for a flat fee. More specialised reports are coming soon.">
+      <div className="mx-auto grid w-full max-w-wide gap-5 md:grid-cols-[1.08fr_0.92fr]">
+        <Card className="pricing-featured relative overflow-hidden shadow-raised">
           <Chip tone="success" icon={Check} className="self-start">Available now</Chip>
           <Heading as="h3" variant="h2">{SLA.productName}</Heading>
           <p className="type-body text-ink-2">A four-section audit covering every aspect of your site&apos;s search performance, with prioritised action items.</p>
           <p className="flex items-baseline gap-2"><span className="type-display text-ink">{price}</span><span className="type-body-lg text-muted">flat fee</span></p>
           <ul className="flex flex-col gap-2">
-            {SECTION_ORDER.map((k) => <CheckItem key={k}>{REPORT_SECTIONS[k].name}</CheckItem>)}
-            <CheckItem>Email when your report is ready</CheckItem>
-            <CheckItem>PDF, ready to share</CheckItem>
+            <CheckItem>All four areas of your search performance</CheckItem>
+            <CheckItem>Prioritised recommendations and practical next steps</CheckItem>
+            <CheckItem>Email delivery and a PDF ready to share</CheckItem>
           </ul>
-          <Link href="/order" className={buttonStyles({ full: true, size: "lg" })}>Get started, {price}</Link>
+          <Link href="/order" className={`${buttonStyles({ full: true, size: "lg" })} landing-primary`}>Get started, {price} <Icon icon={ArrowRight} size="sm" /></Link>
         </Card>
-        <Card className="bg-sunken">
+        <Card className="pricing-upcoming bg-sunken">
           <Chip className="self-start">Coming soon</Chip>
           <IconTile icon={FlaskConical} tone="neutral" />
           <Heading as="h3" variant="h2">More reports</Heading>

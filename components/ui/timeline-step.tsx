@@ -3,16 +3,20 @@ import { cn } from "@/lib/cn";
 import type { StageState } from "@/lib/orders/status";
 import { Icon, type LucideIcon } from "./icon";
 
-/** Figma "Rail step / done | active | pending | sched | failed". */
+/**
+ * Figma "Rail step / done | active | pending | sched | failed". Pending and
+ * scheduled numbers use text-ink-2, not pending-ink: pending-ink on the pending
+ * surface is 2.3:1 and the digits are real text (WCAG AA needs 4.5:1).
+ */
 const marker: Record<StageState, { cls: string; icon?: LucideIcon; sr: string }> = {
   done: { cls: "bg-success text-success-ink", icon: Check, sr: "Completed" },
   active: { cls: "bg-warning text-warning-ink", sr: "In progress" },
-  pending: { cls: "bg-pending text-pending-ink", sr: "Not started" },
-  scheduled: { cls: "bg-pending text-pending-ink", icon: Clock, sr: "Scheduled" },
+  pending: { cls: "bg-pending text-ink-2", sr: "Not started" },
+  scheduled: { cls: "bg-pending text-ink-2", icon: Clock, sr: "Scheduled" },
   failed: { cls: "bg-danger text-danger-ink", icon: X, sr: "Stopped" },
 };
 
-export function TimelineStep({ index, label, meta, state, last }: { index: number; label: string; meta?: string; state: StageState; last?: boolean }) {
+export function TimelineStep({ index, label, meta, state, last }: { index: number; label: string; meta?: React.ReactNode; state: StageState; last?: boolean }) {
   const m = marker[state];
   const quiet = state === "pending" || state === "scheduled";
   return (

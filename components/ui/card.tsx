@@ -5,8 +5,9 @@ type Props = React.HTMLAttributes<HTMLElement> & { as?: "section" | "article" | 
 export function Card({ as: Tag = "section", compact, className, ...props }: Props) {
   return (
     <Tag
+      data-card=""
       className={cn(
-        "flex flex-col gap-card-gap rounded-card border border-hairline bg-raised",
+        "flex flex-col gap-card-gap rounded-card border border-hairline bg-raised transition-colors",
         compact ? "p-card-compact" : "p-card",
         className,
       )}

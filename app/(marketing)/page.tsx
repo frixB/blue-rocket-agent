@@ -5,7 +5,7 @@ import { LandingHero, LandingHowItWorks, LandingIncluded, LandingPricing, Landin
 export default function Landing() {
   return (
     <>
-      <header className="px-5 pt-6">
+      <header className="relative z-20 px-5 pt-5 sm:pt-6">
         <div className="mx-auto w-full max-w-report"><SiteNav /></div>
       </header>
       <main id="main">

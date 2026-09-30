@@ -19,7 +19,7 @@ export function MarketingSection({ id, theme = "app", tint, eyebrow, title, intr
 }) {
   return (
     <section id={id} data-theme={theme} aria-labelledby={title && id ? `${id}-title` : undefined}
-      className={cn("px-5 py-24 text-ink", tint ? "bg-page" : "bg-raised", className)}>
+      className={cn("px-5 py-20 text-ink lg:py-24", tint ? "bg-page" : "bg-raised", className)}>
       <div className="mx-auto flex w-full max-w-report flex-col gap-11">
         {(eyebrow || title || intro) && (
           <header className="flex flex-col items-center gap-3 text-center">
