@@ -2,11 +2,13 @@
 // docs/architecture.md §5 has the full map with node ids.
 export { Avatar } from "./avatar";
 export { Banner } from "./banner";
+export { BarList } from "./bar-list";
 export { Button, buttonStyles } from "./button";
 export { Card, CardTitle } from "./card";
 export { Checkbox } from "./checkbox";
 export { Chip, type Tone } from "./chip";
 export { CodeBlock } from "./code-block";
+export { ColumnChart, niceMax, type ColumnDatum, type ColumnSeries } from "./column-chart";
 export { EmptyState } from "./empty-state";
 export { Field } from "./field";
 export { Heading } from "./heading";
@@ -22,4 +24,5 @@ export { StepList } from "./step-list";
 export { StatusBadge, type BadgeKind } from "./status-badge";
 export { SummaryRow } from "./summary-row";
 export { Tabs } from "./tabs";
+export { Textarea } from "./textarea";
 export { TimelineStep } from "./timeline-step";
