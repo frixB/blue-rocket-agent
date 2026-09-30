@@ -100,10 +100,11 @@ export async function getOrder(id: string): Promise<Order | null> {
   return FIXTURES[id] ?? null;
 }
 
-/** Every paid order on the signed-in account, newest first. S-16 and S-17 read this. */
-export async function listOrders(): Promise<Order[]> {
+/** Every paid order for `email` (all sample orders when omitted), newest first. S-16 and S-17 read this. */
+export async function listOrders(email?: string): Promise<Order[]> {
   return Object.values(FIXTURES)
     .filter((o) => o.status !== "awaiting_payment" && o.status !== "payment_failed")
+    .filter((o) => !email || o.email.toLowerCase() === email.toLowerCase())
     .sort((a, b) => b.paidAt.localeCompare(a.paidAt) || b.reference.localeCompare(a.reference));
 }
 

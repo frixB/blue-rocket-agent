@@ -2,11 +2,19 @@ import Link from "next/link";
 import { Brand } from "@/components/blocks/brand";
 import { SignInForm } from "@/components/blocks/auth-forms";
 import { Heading } from "@/components/ui";
+import type { Route } from "next";
+import { redirect } from "next/navigation";
+import { currentUser } from "@/auth";
+import { Note } from "@/components/ui";
+import { nextPath } from "@/lib/customer";
 import { previewParam } from "@/lib/preview-param";
 
 /** S-18 Sign in (7368:22). Light page, two-panel card. `?preview=sent` shows the link-sent state. */
-export default async function SignIn({ searchParams }: { searchParams: Promise<{ preview?: string }> }) {
-  const preview = previewParam((await searchParams).preview);
+export default async function SignIn({ searchParams }: { searchParams: Promise<{ preview?: string; callbackUrl?: string; error?: string }> }) {
+  const sp = await searchParams;
+  const preview = previewParam(sp.preview);
+  const next = nextPath(sp.callbackUrl);
+  if (await currentUser()) redirect((next ?? "/reports") as Route);
   return (
     <div data-theme="app" className="flex min-h-dvh flex-col bg-page text-ink">
       <header className="px-nav-x py-nav-y"><Link href="/" aria-label="Blue Rocket Agents home"><Brand /></Link></header>
@@ -16,7 +24,10 @@ export default async function SignIn({ searchParams }: { searchParams: Promise<{
             <Heading as="p" variant="display" className="text-info-ink">Your next move starts here.</Heading>
             <p className="type-lead text-info-ink">Keep your reports and priorities in one place.</p>
           </section>
-          <section className="p-modal"><SignInForm preview={preview} /></section>
+          <section className="flex flex-col gap-5 p-modal">
+            {sp.error && <Note tone="warning">That sign-in link has expired or was already used. Send yourself a new one below.</Note>}
+            <SignInForm preview={preview} next={next} />
+          </section>
         </div>
       </main>
     </div>

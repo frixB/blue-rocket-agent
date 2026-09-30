@@ -614,6 +614,17 @@ Account is created **after** payment, silently, from the email captured at check
 
 ---
 
+### 9.1 As built (Auth.js)
+
+- `auth.ts`: Auth.js v5. Email link first (Resend provider, tokens in Postgres through `@auth/pg-adapter`), password second (Credentials provider, scrypt hashes in `lib/password.ts`, 5 failed attempts lock sign-in for 15 minutes). JWT sessions, which the Credentials provider requires.
+- `db/schema.sql` + `npm run db:setup`: the adapter's tables plus password and lockout columns, and the demo customer. The demo email and password live in `scripts/db-setup.mjs`, local and preview only.
+- `/reports` and `/billing` need a session and show only that customer's orders; `/reports/[id]` still opens from a direct link, like the receipt email. Signed-in visitors skip the sign-in screens; sign-out lands on S-20.
+- Email-link flows answer "check your inbox" whether or not the address has an account. Setting a password (S-07, reset) needs a session for that email, so an unsigned visitor gets a confirmation link first.
+- Without `AUTH_RESEND_KEY`, local development shows the sign-in link on screen; production refuses to send. Without `DATABASE_URL` and `AUTH_SECRET`, sign-in says it isn't switched on and the portal shows the sample account.
+- Not yet: creating the account automatically after Stripe payment, signed receipt links for order pages, and moving to Prisma with the rest of §8.1.
+
+---
+
 ## 10. Accessibility and quality gates
 
 Non-negotiable, checked in CI:
