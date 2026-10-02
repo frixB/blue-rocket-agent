@@ -29,7 +29,7 @@ export function ContextLayout({ title, lead, steps, children }: {
           <Heading variant="display" className="type-bra-display-responsive">{title}</Heading>
           {lead && <p className="type-lead text-ink-2">{lead}</p>}
           {steps && (
-            <ol className="grid gap-2 type-body text-ink-2 sm:gap-3">
+            <ol className="hidden gap-2 type-body text-ink-2 sm:grid sm:gap-3">
               {steps.map((s, i) => <li key={s} className="flex gap-3"><span className="tabular-nums text-muted">{String(i + 1).padStart(2, "0")}</span>{s}</li>)}
             </ol>
           )}

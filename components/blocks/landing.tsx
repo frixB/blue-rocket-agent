@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, Check, FileText, FlaskConical, Timer } from "lucide-react";
+import { ArrowRight, Check, FileText, Lock, ShieldCheck, Timer } from "lucide-react";
 import { Card, Chip, Heading, Icon, IconTile, buttonStyles } from "@/components/ui";
 import { SLA, formatPriceShort } from "@/lib/orders/sla";
 import { Brand } from "./brand";
 import { MarketingSection } from "./marketing-section";
 import { REPORT_SECTIONS, SECTION_ORDER } from "./report-sections";
+import { UPCOMING_REPORTS } from "./upcoming-reports";
 import { WaitlistDialog } from "./waitlist-dialog";
 
 /*
@@ -15,6 +16,12 @@ import { WaitlistDialog } from "./waitlist-dialog";
 
 const price = formatPriceShort(SLA.priceCents);
 const CONTACT = "hello@bluerocketagents.com";
+/** One refund promise, worded once. */
+const REFUND = "Full refund if we can't complete your audit";
+/** Total checks across the four sections, from the same list the report uses. */
+const CHECKS = SECTION_ORDER.reduce((n, k) => n + REPORT_SECTIONS[k].includes.length, 0);
+/** Who does the audit, said once and early. */
+const WHO = "AI agents run the analysis, and a person reviews every report before it reaches you.";
 
 function CheckItem({ children }: { children: React.ReactNode }) {
   return (
@@ -22,6 +29,21 @@ function CheckItem({ children }: { children: React.ReactNode }) {
       <Icon icon={Check} size="sm" className="mt-0.5 text-success-accent" />
       <span>{children}</span>
     </li>
+  );
+}
+
+/**
+ * The buy action, repeated where intent peaks: after the proof, after the
+ * objections, and at the close. Same label and destination everywhere.
+ */
+export function OrderCta({ note, align = "center", withPrice }: { note?: string; align?: "center" | "start"; withPrice?: boolean }) {
+  return (
+    <div className={`flex flex-col gap-3 ${align === "center" ? "items-center text-center" : "items-start"}`}>
+      <Link href="/order" className={`${buttonStyles({ size: "lg" })} landing-primary`}>
+        Get my SEO report{withPrice ? `, ${price}` : ""} <Icon icon={ArrowRight} size="sm" />
+      </Link>
+      {note && <p className="type-caption text-muted">{note}</p>}
+    </div>
   );
 }
 
@@ -39,22 +61,22 @@ export function LandingHero() {
           </p>
           <div className="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
             <Link href="/order" className={`${buttonStyles({ size: "lg" })} landing-primary`}>Get my SEO report <Icon icon={ArrowRight} size="sm" /></Link>
-            <a href="#sample" className={buttonStyles({ variant: "darkghost", size: "lg" })}>See a sample finding</a>
+            <a href="#sample" className={buttonStyles({ variant: "darkghost", size: "lg" })}>See an example report</a>
           </div>
           <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2 type-caption text-ink-2" aria-label="What you can count on">
-            <li className="flex items-center gap-1.5"><Icon icon={Check} size="sm" className="text-success-accent" /> Flat {price} fee</li>
-            <li className="flex items-center gap-1.5"><Icon icon={Timer} size="sm" className="text-success-accent" /> Within {SLA.businessDays} business day</li>
+            <li className="flex items-center gap-1.5"><Icon icon={Timer} size="sm" className="text-success-accent" /> Report within {SLA.businessDays} business day, Monday to Friday</li>
             <li className="flex items-center gap-1.5"><Icon icon={FileText} size="sm" className="text-success-accent" /> Prioritised next steps</li>
+            <li className="flex items-center gap-1.5"><Icon icon={ShieldCheck} size="sm" className="text-success-accent" /> {REFUND}</li>
           </ul>
         </div>
 
-        <div className="relative mt-8 h-[25rem] w-full max-w-[64rem] overflow-hidden sm:mt-10 sm:h-[32rem]" aria-label="The four areas covered by the SEO report">
+        <div className="hero-stage relative mt-8 h-[22rem] w-full max-w-[64rem] overflow-hidden sm:mt-10 sm:h-[32rem]" aria-label="The four areas covered by the SEO report">
           <div className="hero-orbit hero-orbit-far" aria-hidden />
           <div className="hero-orbit hero-orbit-near" aria-hidden />
           <div className="hero-planet" aria-hidden>
             <div className="hero-planet-grid" />
           </div>
-          <ol className="absolute inset-0">
+          <ol className="absolute inset-0 max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-5 max-sm:grid max-sm:grid-cols-2 max-sm:gap-2">
             {SECTION_ORDER.map((key, i) => {
               const s = REPORT_SECTIONS[key];
               return (
@@ -62,7 +84,7 @@ export function LandingHero() {
                   <IconTile icon={s.icon} tone="info" size="sm" />
                   <span className="min-w-0 text-left">
                     <span className="block type-caption text-muted">0{i + 1}</span>
-                    <span className="block whitespace-nowrap type-body-strong text-ink">{s.name}</span>
+                    <span className="block type-body-strong text-ink sm:whitespace-nowrap">{s.name}</span>
                   </span>
                 </li>
               );
@@ -96,43 +118,109 @@ export function LandingIncluded() {
           );
         })}
       </div>
-      <div className="flex justify-center">
-        <a href="#sample" className={buttonStyles({ variant: "ghost", size: "sm" })}>See how findings become next steps</a>
-      </div>
     </MarketingSection>
   );
 }
 
-const SAMPLE = [
-  { priority: "Fix first", area: "Technical SEO", issue: "Some important pages cannot be indexed.", next: "Check indexing rules and submit the corrected sitemap." },
-  { priority: "Improve next", area: "On-page SEO", issue: "Service pages need clearer titles and headings.", next: "Describe each service and location in a unique page title." },
-];
+/*
+ * The example report excerpt (#sample). Same structure as a delivered report
+ * (score, counts, "Fix first", findings by severity) so visitors see what they
+ * are buying. The business is fictional and the page says so.
+ */
+const EXAMPLE = {
+  business: "A local plumbing company",
+  city: "Austin, TX",
+  score: 61,
+  issues: 23,
+  critical: 4,
+  pages: 14,
+  fixFirst: [
+    { action: "Compress the homepage hero image", why: "About an hour of work, and the biggest single traffic gain." },
+    { action: "Fix the four broken menu links", why: "Your own site is pointing Google at dead pages." },
+    { action: "Build one page for \u201cemergency plumber Austin\u201d", why: "It's the search term you're closest to winning." },
+  ],
+  findings: [
+    { severity: "critical", area: "Technical SEO", title: "Homepage takes 6.8s to load on mobile", body: "Google's threshold is 2.5s, and 71% of visits come from phones." },
+    { severity: "critical", area: "On-Page SEO", title: "No main heading on 9 of 14 pages", body: "Google can't tell what those pages are about." },
+    { severity: "medium", area: "Technical SEO", title: "robots.txt blocks your own sitemap", body: "A leftover staging rule stops Google reading /sitemap.xml." },
+    { severity: "pass", area: "Technical SEO", title: "HTTPS and redirects", body: "All traffic redirects correctly to the secure site." },
+  ],
+} as const;
+
+const SEVERITY = { critical: { tone: "danger", label: "Critical" }, medium: { tone: "warning", label: "Medium" }, pass: { tone: "success", label: "Pass" } } as const;
+
+/**
+ * Proof slots. Leave null until real material exists; never fill with
+ * invented quotes. `quote` renders under the report, `samplePdf` adds a link.
+ */
+const PROOF: { quote: { text: string; name: string; business: string } | null; samplePdf: string | null } = { quote: null, samplePdf: null };
 
 export function LandingSample() {
   return (
-    <MarketingSection id="sample" theme="marketing" className="sample-section relative overflow-hidden" title="From finding to next step"
-      intro="Illustrative preview. Sample findings, not results from a customer audit.">
-      <ol className="sample-findings mx-auto w-full max-w-wide border-y border-hairline">
-        {SAMPLE.map((f, i) => (
-          <li key={f.issue} className="sample-finding grid gap-4 border-b border-hairline px-3 py-7 last:border-b-0 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-center md:gap-8 md:px-5">
-            <div className="flex min-w-0 gap-4">
-              <span className="type-bra-heading-2 text-action">{String(i + 1).padStart(2, "0")}</span>
-              <div className="flex min-w-0 flex-col gap-1">
-                <p className="type-overline uppercase text-action">{f.priority} · {f.area}</p>
-                <p className="type-body-strong text-ink">{f.issue}</p>
+    <MarketingSection id="sample" theme="marketing" className="sample-section relative overflow-hidden" title="See what you get"
+      intro={`An excerpt from an example report. Yours is built from your own website and covers all four areas. ${WHO}`}>
+      <article aria-label="Example report excerpt" className="report-sheet mx-auto w-full max-w-wide overflow-hidden rounded-card border border-hairline bg-raised">
+        <header className="flex flex-col gap-4 border-b border-hairline px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-7">
+          <div className="flex flex-col gap-1">
+            <p className="type-caption text-muted">Example report · fictional business</p>
+            <p className="type-heading-h4 text-ink">{EXAMPLE.business}, {EXAMPLE.city}</p>
+          </div>
+          <dl className="flex flex-wrap gap-x-6 gap-y-2">
+            {[
+              [`${EXAMPLE.score}/100`, "health score"],
+              [String(EXAMPLE.issues), "issues"],
+              [String(EXAMPLE.critical), "critical"],
+              [String(EXAMPLE.pages), "pages checked"],
+            ].map(([v, k]) => (
+              <div key={k} className="flex items-baseline gap-1.5">
+                <dt className="sr-only">{k}</dt>
+                <dd className="type-body-strong tabular-nums text-ink">{v}</dd>
+                <span aria-hidden className="type-caption text-muted">{k}</span>
               </div>
-            </div>
-            <Icon icon={ArrowRight} className="sample-finding-arrow hidden text-muted md:block" />
-            <div className="flex flex-col gap-1 pl-12 md:pl-0">
-              <p className="type-caption-strong text-muted">Recommended next step</p>
-              <p className="type-body-sm text-ink-2">{f.next}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-      <p className="mx-auto max-w-main text-center type-body text-ink-2">
-        Every finding connects the issue, its impact and a practical next step. Your report covers technical, on-page, backlink and competitor analysis.
-      </p>
+            ))}
+          </dl>
+        </header>
+        <div className="grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+          <section aria-labelledby="example-fix-first" className="flex flex-col gap-4 border-b border-hairline px-5 py-6 sm:px-7 md:border-b-0 md:border-r">
+            <h3 id="example-fix-first" className="type-body-strong text-ink">Fix first</h3>
+            <ol className="flex flex-col gap-4">
+              {EXAMPLE.fixFirst.map((f, i) => (
+                <li key={f.action} className="grid grid-cols-[1.75rem_minmax(0,1fr)] gap-x-2">
+                  <span className="type-body-strong tabular-nums text-info-ink">{i + 1}</span>
+                  <span className="flex flex-col gap-0.5">
+                    <span className="type-body-strong text-ink">{f.action}</span>
+                    <span className="type-body-sm text-ink-2">{f.why}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </section>
+          <section aria-labelledby="example-findings" className="flex flex-col gap-4 px-5 py-6 sm:px-7">
+            <h3 id="example-findings" className="type-body-strong text-ink">Findings</h3>
+            <ul className="flex flex-col divide-y divide-hairline">
+              {EXAMPLE.findings.map((f) => (
+                <li key={f.title} className="flex flex-col gap-1.5 py-3.5 first:pt-0 last:pb-0 sm:flex-row sm:gap-4">
+                  <span className="w-20 shrink-0 pt-0.5"><Chip tone={SEVERITY[f.severity].tone} className={f.severity === "pass" ? "bg-success/45" : undefined}>{SEVERITY[f.severity].label}</Chip></span>
+                  <span className="flex min-w-0 flex-col gap-0.5">
+                    <span className="type-body-strong text-ink">{f.title}</span>
+                    <span className="type-body-sm text-ink-2">{f.body} <span className="text-muted">· {f.area}</span></span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </article>
+      {PROOF.quote && (
+        <figure className="mx-auto flex max-w-main flex-col gap-3 text-center">
+          <blockquote className="type-lead text-ink">&ldquo;{PROOF.quote.text}&rdquo;</blockquote>
+          <figcaption className="type-caption text-muted">{PROOF.quote.name}, {PROOF.quote.business}</figcaption>
+        </figure>
+      )}
+      <div className="flex flex-col items-center gap-4">
+        <OrderCta withPrice note={`Your own report within ${SLA.businessDays} business day`} />
+        {PROOF.samplePdf && <a href={PROOF.samplePdf} className="type-body-sm text-ink-2 underline hover:text-ink">Download the full example report (PDF)</a>}
+      </div>
     </MarketingSection>
   );
 }
@@ -144,14 +232,15 @@ const STEPS = [
 ];
 
 const FAQ = [
-  { q: "When does analysis run?", a: "Our agents work Monday to Friday. Order any time: weekend orders start first thing Monday. Track progress on your order page, and we email you when the report is ready." },
+  { q: "When does analysis run?", a: "Monday to Friday. Order any time: weekend orders start first thing Monday. Track progress on your order page, and we email you when the report is ready." },
   { q: "What does the price include?", a: "One SEO audit report covering four areas of search performance, with prioritised recommendations. There is no subscription. Implementing the recommendations is separate." },
-  { q: "What if the site can't be audited?", a: "You'll see the issue and any action needed on your order page. If we can't complete the audit, you get a full refund." },
+  { q: "What if the site can't be audited?", a: `You'll see the issue and any action needed on your order page. ${REFUND}.` },
+  { q: "Who does the audit?", a: `${WHO} You can reply to the report email with any question.` },
 ];
 
 export function LandingHowItWorks() {
   return (
-    <MarketingSection id="faq" title="From your website to your next move">
+    <MarketingSection id="how-it-works" title="From your website to your next move">
       <ol className="process-path grid gap-5 md:grid-cols-3">
         {STEPS.map((s, i) => (
           <li key={s.title} className="process-step relative flex flex-col gap-2 rounded-card px-5 py-6">
@@ -161,9 +250,9 @@ export function LandingHowItWorks() {
           </li>
         ))}
       </ol>
-      <div className="flex flex-col gap-6 border-t border-hairline pt-10">
+      <div id="faq" className="flex flex-col gap-6 border-t border-hairline pt-10">
         <Heading as="h3" variant="h2">Before you get started</Heading>
-        <dl className="faq-grid grid gap-x-8 gap-y-7 md:grid-cols-3">
+        <dl className="faq-grid grid gap-x-8 gap-y-7 md:grid-cols-2">
           {FAQ.map((f) => (
             <div key={f.q} className="flex flex-col gap-1.5">
               <dt className="type-body-strong text-ink">{f.q}</dt>
@@ -171,6 +260,7 @@ export function LandingHowItWorks() {
             </div>
           ))}
         </dl>
+        <OrderCta align="start" withPrice note={`Pay once. ${REFUND}.`} />
       </div>
     </MarketingSection>
   );
@@ -178,32 +268,45 @@ export function LandingHowItWorks() {
 
 export function LandingPricing() {
   return (
-    <MarketingSection id="pricing" tint title="Get your SEO report"
-      intro="One focused audit for a flat fee. More specialised reports are coming soon.">
-      <div className="mx-auto grid w-full max-w-wide gap-5 md:grid-cols-[1.08fr_0.92fr]">
-        <Card className="pricing-featured relative overflow-hidden shadow-raised">
-          <Chip tone="success" icon={Check} className="self-start">Available now</Chip>
+    <MarketingSection id="pricing" tint title="One report. One flat price."
+      intro="No subscription, no retainer. Pay once and get a plan you can act on yourself or hand to your web person.">
+      <Card className="pricing-featured relative mx-auto w-full max-w-wide overflow-hidden shadow-raised md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-10">
+        <div className="flex flex-col gap-4">
           <Heading as="h3" variant="h2">{SLA.productName}</Heading>
-          <p className="type-body text-ink-2">A four-section audit covering every aspect of your site&apos;s search performance, with prioritised action items.</p>
-          <p className="flex items-baseline gap-2"><span className="type-display text-ink">{price}</span><span className="type-body-lg text-muted">flat fee</span></p>
-          <ul className="flex flex-col gap-2">
-            <CheckItem>All four areas of your search performance</CheckItem>
-            <CheckItem>Prioritised recommendations and practical next steps</CheckItem>
-            <CheckItem>Email delivery and a PDF ready to share</CheckItem>
-          </ul>
-          <Link href="/order" className={`${buttonStyles({ full: true, size: "lg" })} landing-primary`}>Get started, {price} <Icon icon={ArrowRight} size="sm" /></Link>
-        </Card>
-        <Card className="pricing-upcoming bg-sunken">
-          <Chip className="self-start">Coming soon</Chip>
-          <IconTile icon={FlaskConical} tone="neutral" />
-          <Heading as="h3" variant="h2">More reports</Heading>
-          <p className="type-body text-ink-2">
-            We&apos;re building more specialised reports: Local SEO, Google Ads audit, content strategy and more. Join the waitlist and you&apos;ll be first to know when they launch.
-          </p>
-          <WaitlistDialog />
-        </Card>
-      </div>
+          <p className="type-body text-ink-2">{CHECKS} checks across four areas of your site&apos;s search performance, reviewed by a person, with the fixes put in order.</p>
+          <p className="flex items-baseline gap-2"><span className="type-display tabular-nums text-ink">{price}</span><span className="type-body-lg text-muted">one-time</span></p>
+          <div className="mt-auto flex flex-col gap-2.5 pt-2">
+            <Link href="/order" className={`${buttonStyles({ full: true, size: "lg" })} landing-primary`}>Get my SEO report, {price} <Icon icon={ArrowRight} size="sm" /></Link>
+            <p className="flex items-center justify-center gap-1.5 type-caption text-muted"><Icon icon={Lock} size="sm" /> Secure checkout with Stripe · Takes about 2 minutes</p>
+          </div>
+        </div>
+        <ul className="flex flex-col gap-3 border-t border-hairline pt-6 md:border-l md:border-t-0 md:pl-10 md:pt-0" aria-label="What's included">
+          <CheckItem>All four areas: technical, on-page, backlinks and competitors</CheckItem>
+          <CheckItem>Fixes in priority order, each with a practical next step</CheckItem>
+          <CheckItem>Delivered within {SLA.businessDays} business day (Monday to Friday)</CheckItem>
+          <CheckItem>Email delivery and a PDF ready to share</CheckItem>
+          <CheckItem>{REFUND}</CheckItem>
+          <CheckItem>One-time payment. No subscription.</CheckItem>
+        </ul>
+      </Card>
     </MarketingSection>
+  );
+}
+
+/** The last screen before the footer: one sentence, one action. */
+export function LandingClose() {
+  return (
+    <section aria-labelledby="close-title" className="landing-close relative isolate overflow-hidden px-5 py-24 lg:py-28">
+      <div className="mx-auto flex w-full max-w-[44rem] flex-col items-center gap-6 text-center">
+        <Heading as="h2" id="close-title" variant="display" className="type-bra-display-responsive text-balance">
+          Know what to fix first, within {SLA.businessDays} business day
+        </Heading>
+        <p className="max-w-[34rem] type-lead text-ink-2">
+          Tell us about your business, pay once, and get a prioritised plan for your website. No subscription.
+        </p>
+        <OrderCta withPrice note="Secure checkout with Stripe · Takes about 2 minutes" />
+      </div>
+    </section>
   );
 }
 
@@ -213,10 +316,14 @@ export function SiteFooter() {
       <div className="mx-auto flex w-full max-w-report flex-col gap-10">
         <div className="flex max-w-md flex-col gap-3">
           <Brand />
-          <p className="type-body-sm text-ink-2">AI-powered SEO audits for local businesses. Understand what is holding your site back and what to improve next.</p>
+          <p className="type-body-sm text-ink-2">SEO audits for local businesses, run by AI and reviewed by a person. Understand what is holding your site back and what to improve next.</p>
+        </div>
+        <div className="flex flex-col gap-1 type-body-sm text-ink-2">
+          <p className="type-body-strong text-ink">More reports are on the way</p>
+          <div>{UPCOMING_REPORTS.join(", ")}. <WaitlistDialog variant="link" triggerLabel="Get notified" /></div>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-hairline pt-6 type-caption text-muted">
-          <p>© 2026 Blue Rocket Agents. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Blue Rocket Agents. All rights reserved.</p>
           <a href={`mailto:${CONTACT}`} className="hover:text-ink">Contact</a>
         </div>
       </div>

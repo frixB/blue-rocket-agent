@@ -50,7 +50,7 @@ export function OrderForm({ price, productName }: { price: string; productName: 
   const urlOk = check.state === "verified" || acceptedUrl === f.url;
   const step1Ready = f.name.trim() && f.url.trim() && urlOk && f.industry && f.city.trim() && f.country;
   const emailOk = EMAIL.test(f.email.trim());
-  const step2Ready = f.revenue && f.employees && emailOk;
+  const step2Ready = emailOk;
   const host = (() => { try { return new URL(check.state === "verified" || check.state === "mismatch" ? check.url : `https://${f.url}`).host; } catch { return f.url; } })();
 
   if (step === 2) {
@@ -58,10 +58,9 @@ export function OrderForm({ price, productName }: { price: string; productName: 
       <form noValidate className="flex flex-col gap-8" onSubmit={(e) => {
         e.preventDefault();
         setAttemptedStep(2);
-        setTouched((current) => ({ ...current, revenue: true, employees: true, email: true }));
+        setTouched((current) => ({ ...current, email: true }));
         if (!step2Ready) {
-          const first = !f.revenue ? "revenue" : !f.employees ? "employees" : "email";
-          document.getElementById(first)?.focus();
+          document.getElementById("email")?.focus();
           return;
         }
         setPaying(true);
@@ -84,19 +83,15 @@ export function OrderForm({ price, productName }: { price: string; productName: 
           <span className="type-heading-h4 text-action">{price}</span>
         </div>
         <div className="flex flex-col gap-6">
-          <Field htmlFor="revenue" label="Monthly revenue range" hint="We use this to put the recommended SEO investment in context." required
-            message={touched.revenue && !f.revenue ? { tone: "danger", text: "Choose the range that best describes your business." } : undefined}>
-            <Select id="revenue" required value={f.revenue} onChange={set("revenue")} onBlur={touch("revenue")}
-              state={touched.revenue && !f.revenue ? "error" : "default"} aria-describedby="revenue-hint revenue-msg">
-              <option value="" disabled>Choose a range</option>
+          <Field htmlFor="revenue" label="Monthly revenue range (optional)" hint="Helps us keep recommendations realistic for your budget.">
+            <Select id="revenue" value={f.revenue} onChange={set("revenue")} aria-describedby="revenue-hint">
+              <option value="">Prefer not to say</option>
               {REVENUE.map((o) => <option key={o}>{o}</option>)}
             </Select>
           </Field>
-          <Field htmlFor="employees" label="Number of employees" hint="We use this to keep recommendations realistic for your team." required
-            message={touched.employees && !f.employees ? { tone: "danger", text: "Choose your current team size." } : undefined}>
-            <Select id="employees" required value={f.employees} onChange={set("employees")} onBlur={touch("employees")}
-              state={touched.employees && !f.employees ? "error" : "default"} aria-describedby="employees-hint employees-msg">
-              <option value="" disabled>Choose a size</option>
+          <Field htmlFor="employees" label="Number of employees (optional)" hint="Helps us suggest fixes your team can actually take on.">
+            <Select id="employees" value={f.employees} onChange={set("employees")} aria-describedby="employees-hint">
+              <option value="">Prefer not to say</option>
               {EMPLOYEES.map((o) => <option key={o}>{o}</option>)}
             </Select>
           </Field>
@@ -109,7 +104,7 @@ export function OrderForm({ price, productName }: { price: string; productName: 
         </div>
         <div className="flex flex-col items-center gap-4">
           {attemptedStep === 2 && !step2Ready && (
-            <p role="alert" className="w-full type-body-sm-strong text-danger-ink">Complete the highlighted fields before continuing to secure payment.</p>
+            <p role="alert" className="w-full type-body-sm-strong text-danger-ink">Enter your email so we know where to send the report.</p>
           )}
           <Button type="submit" size="lg" full loading={paying}>Continue to secure payment · {price} <Icon icon={ArrowRight} size="sm" /></Button>
           <Chip>Secured by Stripe · PCI DSS compliant</Chip>
