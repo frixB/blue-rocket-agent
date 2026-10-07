@@ -5,7 +5,8 @@ import { supportHref } from "@/lib/support";
 import { PageHeader } from "@/components/blocks/page-header";
 import { PortalTabs } from "@/components/blocks/portal-tabs";
 import { CreditRow, ReportRow } from "@/components/blocks/report-row";
-import { getAccount, listOrders } from "@/lib/orders/fixtures";
+import { requireCustomer } from "@/lib/customer";
+import { listOrders } from "@/lib/orders/fixtures";
 import { SLA, formatPriceShort } from "@/lib/orders/sla";
 
 /**
@@ -14,7 +15,8 @@ import { SLA, formatPriceShort } from "@/lib/orders/sla";
  */
 export default async function MyReports({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const { view } = await searchParams;
-  const [account, all] = await Promise.all([getAccount(), listOrders()]);
+  const account = await requireCustomer("/reports");
+  const all = await listOrders(account.email);
   const orders = view === "empty" ? [] : all;
   const credits = orders.filter((o) => o.status === "partial");
   return (

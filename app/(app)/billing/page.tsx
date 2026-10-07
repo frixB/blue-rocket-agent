@@ -2,11 +2,13 @@ import { PageHeader } from "@/components/blocks/page-header";
 import { PortalTabs } from "@/components/blocks/portal-tabs";
 import { TransactionsTable, transactions } from "@/components/blocks/transactions-table";
 import { Note } from "@/components/ui";
+import { requireCustomer } from "@/lib/customer";
 import { listOrders } from "@/lib/orders/fixtures";
 
 /** S-17 Billing and receipts (7366:102). */
 export default async function Billing() {
-  const rows = transactions(await listOrders());
+  const account = await requireCustomer("/billing");
+  const rows = transactions(await listOrders(account.email));
   return (
     <>
       <PortalTabs />
