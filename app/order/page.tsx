@@ -9,7 +9,7 @@ export default function OrderPage() {
     <ContextLayout
       title={<>A clearer picture.<br />A better next step.</>}
       lead={`Turn your website into a focused plan for better search visibility. Flat ${formatPriceShort(SLA.priceCents)}, no subscription.`}
-      steps={["Tell us about your business", "Pay once, then follow the analysis", `Receive your report within ${SLA.businessDays} business day`]}
+      steps={["Tell us about your business", "Pay once, then follow the analysis", `Receive your report within ${SLA.deliveryHours} hours`]}
     >
       <Modal aria-label="Order your report">
         <OrderForm price={formatPriceShort(SLA.priceCents)} productName={SLA.productName} />

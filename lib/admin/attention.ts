@@ -1,5 +1,5 @@
 import type { Route } from "next";
-import { autoSendAt, clockState, escalatesAt, formatRelative, formatTimeLeft } from "./clock";
+import { CLOCK, autoSendAt, clockState, escalatesAt, formatRelative, formatTimeLeft } from "./clock";
 import type { AdminOrder } from "./types";
 
 export type AttentionKind = "escalated" | "late" | "urgent" | "blocked" | "failed" | "payment" | "unreviewed" | "pdf" | "duplicate" | "disputed";
@@ -18,7 +18,7 @@ export function needsAttention(orders: AdminOrder[], now: Date): AttentionItem[]
     const clock = clockState(o, now);
     if (o.status === "escalated") {
       items.push({ order: o, kind: "escalated", href: detail(o), title: "Escalated, auto-refund running",
-        detail: `Past 48 hours. Refund fires unless an owner stops it. Stuck at ${o.failure?.stage ?? "a stage"}.` });
+        detail: `Past ${CLOCK.escalateHours} hours. Refund fires unless an owner stops it. Stuck at ${o.failure?.stage ?? "a stage"}.` });
     } else if (o.status === "late" || clock === "late") {
       items.push({ order: o, kind: "late", href: detail(o), title: formatTimeLeft(o.paidAt, now),
         detail: `Escalates and starts the auto-refund ${formatRelative(escalatesAt(o.paidAt), now)}.` });

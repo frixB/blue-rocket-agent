@@ -1,6 +1,7 @@
 import { Mail, TriangleAlert, User } from "lucide-react";
 import { Avatar, Card, CardTitle, Chip, buttonStyles } from "@/components/ui";
 import { StatusLayout } from "@/components/blocks/status-layout";
+import { SLA } from "@/lib/orders/sla";
 import { RefundNote, type StateProps } from "./shared";
 
 export function Escalated({ order }: StateProps) {
@@ -11,7 +12,7 @@ export function Escalated({ order }: StateProps) {
       showClaim={false}
       tile={{ icon: Mail, tone: "danger" }}
       heading="This has taken far too long"
-      body="Your report has run a full business day past what we promised. We've stopped giving you estimates because ours have clearly been wrong."
+      body={`Your report has run ${SLA.escalateAfterHours} hours past what we promised. We've stopped giving you estimates because ours have clearly been wrong.`}
       chips={<><Chip tone="danger" icon={TriangleAlert}>Overdue</Chip><Chip tone="warning" icon={User}>Escalated to a person</Chip></>}
     >
       <Card>

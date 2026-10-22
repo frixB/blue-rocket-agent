@@ -1,6 +1,7 @@
 import type { Route } from "next";
 import { format } from "date-fns";
 import { BarList, ColumnChart } from "@/components/ui";
+import { SLA } from "@/lib/orders/sla";
 import { clockState } from "@/lib/admin/clock";
 import type { DailyStat } from "@/lib/admin/fixtures";
 import type { AdminOrder, AdminStatus } from "@/lib/admin/types";
@@ -12,13 +13,13 @@ const title = (iso: string) => format(new Date(iso), "EEE d MMM");
 const usdCompact = (cents: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact" }).format(cents / 100);
 
-/** The 24-hour promise, day by day. On time in the action blue, late in danger red: the pair passes the colour-blind check. */
+/** The delivery promise, day by day. On time in the action blue, late in danger red: the pair passes the colour-blind check. */
 export function OnTimeChart({ stats }: { stats: DailyStat[] }) {
   const delivered = stats.reduce((a, d) => a + d.delivered, 0);
   const late = stats.reduce((a, d) => a + d.late, 0);
   const rate = delivered ? Math.round(((delivered - late) / delivered) * 100) : 100;
   return (
-    <ChartCard id="ontime" title="Delivered within 24 hours" note="Reports sent per day, last 14 days"
+    <ChartCard id="ontime" title={`Delivered within ${SLA.deliveryHours} hours`} note="Reports sent per day, last 14 days"
       headline={{ value: `${rate}%`, label: `on time · ${late} of ${delivered} late` }}
       table={{ caption: "Reports delivered per day, on time and late", columns: ["Day", "On time", "Late"],
         rows: stats.map((d) => [title(d.day), d.delivered - d.late, d.late]) }}>

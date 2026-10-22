@@ -46,10 +46,6 @@ export const FIXTURES: Record<string, Order> = {
     stages: stages({ stage: "payment", state: "done", at: at(15, 9, 14) }, { stage: "crawl", state: "done", at: at(15, 9, 41) },
       { stage: "analysis", state: "active" }, { stage: "compile", state: "pending" }, { stage: "delivery", state: "pending" }) },
 
-  "demo-weekend": { ...base, id: "demo-weekend", reference: "BRA-4472", status: "weekend_queued", paidAt: at(18, 18, 42),
-    stages: stages({ stage: "payment", state: "done", at: at(18, 18, 42) }, { stage: "crawl", state: "scheduled" },
-      { stage: "analysis", state: "scheduled" }, { stage: "compile", state: "scheduled" }, { stage: "delivery", state: "scheduled" }) },
-
   "demo-blocked": { ...base, id: "demo-blocked", reference: "BRA-4473", status: "blocked", paidAt: at(15, 9, 14),
     stages: stages({ stage: "payment", state: "done", at: at(15, 9, 14) }, { stage: "crawl", state: "failed", at: at(15, 9, 22), note: "Blocked by robots.txt" },
       { stage: "analysis", state: "pending" }, { stage: "compile", state: "pending" }, { stage: "delivery", state: "pending" }) },
@@ -60,7 +56,7 @@ export const FIXTURES: Record<string, Order> = {
 
   "demo-escalated": { ...base, id: "demo-escalated", reference: "BRA-4475", status: "escalated", paidAt: at(15, 9, 14),
     owner: { name: "Carlos R.", email: "carlos@bluerocketagents.com" },
-    refund: { reference: "BRA-4475-R", issuedAt: at(17, 9, 2), reason: "Missed delivery by a full business day" },
+    refund: { reference: "BRA-4475-R", issuedAt: at(17, 9, 2), reason: "Missed delivery by a full day" },
     stages: stages({ stage: "payment", state: "done", at: at(15, 9, 14) }, { stage: "crawl", state: "done", at: at(15, 16, 20) },
       { stage: "analysis", state: "failed", note: "Escalated to a person" }, { stage: "compile", state: "pending" }, { stage: "delivery", state: "pending" }) },
 

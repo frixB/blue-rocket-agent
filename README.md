@@ -1,6 +1,6 @@
 # Blue Rocket Agents
 
-A full SEO report for small businesses. $1,500 flat, delivered within one business day (Mon to Fri).
+A full SEO report for small businesses. $1,500 flat, delivered within 48 hours of payment, any day of the week.
 
 This repo is built code-first. Screens are designed directly in React against design tokens exported from Figma. Figma holds the tokens and the visual reference; it isn't where screens get finished.
 
@@ -22,7 +22,7 @@ Every order state has a fixture. Open `/dev/states` locally to click through all
 | `npm run check` | Tokens, typecheck, lint, tests. Run before every PR. |
 | `npm run build` | Production build |
 | `npm run tokens:build` | Regenerate CSS from `design-tokens/tokens.json` |
-| `npm test` | Unit tests, including the business-day SLA maths |
+| `npm test` | Unit tests, including the delivery-promise maths |
 
 ## Where things live
 

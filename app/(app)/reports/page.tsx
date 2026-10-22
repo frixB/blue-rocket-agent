@@ -38,7 +38,7 @@ export default async function MyReports({ searchParams }: { searchParams: Promis
           </ul>
         ) : (
           <EmptyState icon={Rocket} title="No reports yet"
-            body={`Your first SEO report is delivered within one business day. Flat ${formatPriceShort(SLA.priceCents)}, no subscription, full refund if we can't audit your site.`}
+            body={`Your first SEO report is delivered within ${SLA.deliveryHours} hours. Flat ${formatPriceShort(SLA.priceCents)}, no subscription, full refund if we can't audit your site.`}
             action={<Link href="/order" className={buttonStyles()}>Get your first report</Link>} />
         )}
       </main>

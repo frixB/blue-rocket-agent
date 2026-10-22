@@ -1,11 +1,8 @@
 import type { OrderStatus } from "@/lib/orders/status";
 import type { Finding, SectionKey, StageRecord } from "@/lib/orders/types";
 
-/**
- * The admin panel uses the customer's order statuses, minus weekend_queued.
- * Reports run any day, so nothing is ever parked for the weekend.
- */
-export type AdminStatus = Exclude<OrderStatus, "weekend_queued">;
+/** The admin panel uses the customer's order statuses. */
+export type AdminStatus = OrderStatus;
 
 export type Role = "owner" | "ops";
 

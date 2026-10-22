@@ -90,7 +90,7 @@ export default async function PipelineHealth() {
       </div>
 
       <Card aria-labelledby="errors-title" className="gap-1">
-        <CardHeader id="errors-title" title="Stuck orders" note="Retrying runs only the stage that failed. The 24-hour clock keeps running." />
+        <CardHeader id="errors-title" title="Stuck orders" note="Retrying runs only the stage that failed. The delivery clock keeps running." />
         {failing.length ? (
           <ul className="flex flex-col divide-y divide-hairline">
             {failing.map((o) => {

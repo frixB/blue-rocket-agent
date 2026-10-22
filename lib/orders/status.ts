@@ -5,15 +5,14 @@
 export const ORDER_STATUS = [
   "awaiting_payment", // Stripe session open
   "payment_failed",   // S-03
-  "queued",           // paid, starts later today or first thing tomorrow
-  "weekend_queued",   // S-22, paid outside the working week
+  "queued",           // paid, waiting for a free agent. Reports run every day.
   "crawling",         // S-06
   "analysing",        // S-06
   "compiling",        // S-06
   "reviewing",        // S-06. Remove if there is no human review step.
   "blocked",          // S-08, customer can fix it
   "late",             // S-11, past the promised moment
-  "escalated",        // S-12, a business day past the promise
+  "escalated",        // S-12, a day past the promise
   "partial",          // S-09
   "ready",            // S-13
   "failed",           // S-10
@@ -22,7 +21,7 @@ export const ORDER_STATUS = [
 
 export type OrderStatus = (typeof ORDER_STATUS)[number];
 
-export const IN_FLIGHT = ["queued", "weekend_queued", "crawling", "analysing", "compiling", "reviewing", "late"] as const satisfies readonly OrderStatus[];
+export const IN_FLIGHT = ["queued", "crawling", "analysing", "compiling", "reviewing", "late"] as const satisfies readonly OrderStatus[];
 export const NEEDS_CUSTOMER = ["payment_failed", "blocked"] as const satisfies readonly OrderStatus[];
 export const TERMINAL = ["ready", "partial", "failed", "refunded"] as const satisfies readonly OrderStatus[];
 
@@ -44,10 +43,9 @@ export const STAGE_LABEL: Record<Stage, string> = {
 
 /** Legal transitions. The worker refuses anything not listed here. */
 export const TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {
-  awaiting_payment: ["payment_failed", "queued", "weekend_queued", "crawling"],
+  awaiting_payment: ["payment_failed", "queued", "crawling"],
   payment_failed: ["awaiting_payment"],
   queued: ["crawling"],
-  weekend_queued: ["crawling"],
   crawling: ["analysing", "blocked", "failed", "late"],
   analysing: ["compiling", "partial", "failed", "late"],
   compiling: ["reviewing", "ready", "partial", "failed", "late"],

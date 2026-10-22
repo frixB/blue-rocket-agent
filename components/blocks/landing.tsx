@@ -64,7 +64,7 @@ export function LandingHero() {
             <a href="#sample" className={buttonStyles({ variant: "darkghost", size: "lg" })}>See an example report</a>
           </div>
           <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2 type-caption text-ink-2" aria-label="What you can count on">
-            <li className="flex items-center gap-1.5"><Icon icon={Timer} size="sm" className="text-success-accent" /> Report within {SLA.businessDays} business day, Monday to Friday</li>
+            <li className="flex items-center gap-1.5"><Icon icon={Timer} size="sm" className="text-success-accent" /> Report within {SLA.deliveryHours} hours, every day</li>
             <li className="flex items-center gap-1.5"><Icon icon={FileText} size="sm" className="text-success-accent" /> Prioritised next steps</li>
             <li className="flex items-center gap-1.5"><Icon icon={ShieldCheck} size="sm" className="text-success-accent" /> {REFUND}</li>
           </ul>
@@ -218,7 +218,7 @@ export function LandingSample() {
         </figure>
       )}
       <div className="flex flex-col items-center gap-4">
-        <OrderCta withPrice note={`Your own report within ${SLA.businessDays} business day`} />
+        <OrderCta withPrice note={`Your own report within ${SLA.deliveryHours} hours`} />
         {PROOF.samplePdf && <a href={PROOF.samplePdf} className="type-body-sm text-ink-2 underline hover:text-ink">Download the full example report (PDF)</a>}
       </div>
     </MarketingSection>
@@ -232,7 +232,7 @@ const STEPS = [
 ];
 
 const FAQ = [
-  { q: "When does analysis run?", a: "Monday to Friday. Order any time: weekend orders start first thing Monday. Track progress on your order page, and we email you when the report is ready." },
+  { q: "When does analysis run?", a: `Every day, weekends included. Your report starts as soon as you pay and lands within ${SLA.deliveryHours} hours. Track progress on your order page, and we email you when the report is ready.` },
   { q: "What does the price include?", a: "One SEO audit report covering four areas of search performance, with prioritised recommendations. There is no subscription. Implementing the recommendations is separate." },
   { q: "What if the site can't be audited?", a: `You'll see the issue and any action needed on your order page. ${REFUND}.` },
   { q: "Who does the audit?", a: `${WHO} You can reply to the report email with any question.` },
@@ -283,7 +283,7 @@ export function LandingPricing() {
         <ul className="flex flex-col gap-3 border-t border-hairline pt-6 md:border-l md:border-t-0 md:pl-10 md:pt-0" aria-label="What's included">
           <CheckItem>All four areas: technical, on-page, backlinks and competitors</CheckItem>
           <CheckItem>Fixes in priority order, each with a practical next step</CheckItem>
-          <CheckItem>Delivered within {SLA.businessDays} business day (Monday to Friday)</CheckItem>
+          <CheckItem>Delivered within {SLA.deliveryHours} hours, any day of the week</CheckItem>
           <CheckItem>Email delivery and a PDF ready to share</CheckItem>
           <CheckItem>{REFUND}</CheckItem>
           <CheckItem>One-time payment. No subscription.</CheckItem>
@@ -299,7 +299,7 @@ export function LandingClose() {
     <section aria-labelledby="close-title" className="landing-close relative isolate overflow-hidden px-5 py-24 lg:py-28">
       <div className="mx-auto flex w-full max-w-[44rem] flex-col items-center gap-6 text-center">
         <Heading as="h2" id="close-title" variant="display" className="type-bra-display-responsive text-balance">
-          Know what to fix first, within {SLA.businessDays} business day
+          Know what to fix first, within {SLA.deliveryHours} hours
         </Heading>
         <p className="max-w-[34rem] type-lead text-ink-2">
           Tell us about your business, pay once, and get a prioritised plan for your website. No subscription.
