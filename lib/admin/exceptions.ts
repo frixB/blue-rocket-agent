@@ -21,7 +21,7 @@ export type ExceptionItem = {
   href: Route;
   order?: AdminOrder;
   assignee?: string;
-  /** Minutes left on the 24-hour clock, when one is running. */
+  /** Minutes left on the delivery clock, when one is running. */
   minutesLeft?: number;
 };
 

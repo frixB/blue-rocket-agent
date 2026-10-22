@@ -122,7 +122,7 @@ export function ReportView({ order, mode }: { order: Order; mode: Mode }) {
           {mode === "shared" && (
             <section data-theme="marketing" aria-labelledby="cta-title" className="flex flex-col items-center gap-3.5 rounded-card bg-page px-card py-9 text-center text-ink">
               <Heading as="h2" variant="h2" id="cta-title">Want one for your own site?</Heading>
-              <p className="max-w-xl type-body text-ink-2">Full SEO report, {formatPriceShort(SLA.priceCents)} flat, delivered within one business day. No subscription, no agency retainer.</p>
+              <p className="max-w-xl type-body text-ink-2">Full SEO report, {formatPriceShort(SLA.priceCents)} flat, delivered within {SLA.deliveryHours} hours. No subscription, no agency retainer.</p>
               <Link href="/" className={buttonStyles()}>Get my report</Link>
             </section>
           )}

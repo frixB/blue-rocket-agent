@@ -1,18 +1,18 @@
+import { SLA } from "@/lib/orders/sla";
 import type { AdminStatus } from "./types";
 
 /**
  * The admin clock. Reports run any day, so this is wall-clock time from
  * payment: no business days, no weekend queue, no holiday calendar.
  *
- * lib/orders/sla.ts still does business-day maths for the customer screens.
- * When the front end moves to the 24-hour promise, these numbers move there
- * and this file keeps only the admin-specific parts (urgent, auto-send).
+ * The deadline and escalation come from SLA in lib/orders/sla.ts, the same
+ * promise the customer sees. This file adds the admin-only parts (urgent, auto-send).
  */
 export const CLOCK = {
-  /** Delivery promise: within 24 hours of payment. */
-  deadlineHours: 24,
+  /** Delivery promise, in hours after payment. */
+  deadlineHours: SLA.deliveryHours,
   /** Past this, the order is escalated and the auto-refund starts unless an owner stops it. */
-  escalateHours: 48,
+  escalateHours: SLA.deliveryHours + SLA.escalateAfterHours,
   /** Default auto-send window. A setting: a draft still in review this long before the deadline sends as is. */
   autoSendBeforeHours: 2,
   /** Under this much time left, the order is urgent. */
@@ -37,7 +37,7 @@ export type ClockState = "unpaid" | "on_track" | "urgent" | "late" | "escalated"
 const UNPAID: readonly AdminStatus[] = ["awaiting_payment", "payment_failed"];
 const DELIVERED: readonly AdminStatus[] = ["ready", "partial"];
 
-/** Where an order stands against the 24-hour promise. Drives every "time left" badge. */
+/** Where an order stands against the delivery promise. Drives every "time left" badge. */
 export function clockState(order: { status: AdminStatus; paidAt: string }, now: Date): ClockState {
   if (UNPAID.includes(order.status)) return "unpaid";
   if (DELIVERED.includes(order.status)) return "delivered";

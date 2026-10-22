@@ -84,7 +84,7 @@ export default async function Settings() {
       </Card>
 
       <Card id="delivery" aria-labelledby="delivery-title" className="scroll-mt-24 gap-1">
-        <CardHeader id="delivery-title" title="Delivery rules" note="How the 24-hour promise is enforced." />
+        <CardHeader id="delivery-title" title="Delivery rules" note={`How the ${CLOCK.deadlineHours}-hour promise is enforced.`} />
         <dl className="flex flex-col divide-y divide-hairline">
           <SummaryRow label="Deadline" value={`${CLOCK.deadlineHours} hours after payment, any day`} />
           <SummaryRow label="Escalation and auto-refund" value={`${CLOCK.escalateHours} hours after payment`} />

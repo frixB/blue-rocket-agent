@@ -3,10 +3,11 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/plus-jakarta-sans";
 import "@fontsource/instrument-serif/400.css";
 import "@/styles/globals.css";
+import { SLA, formatPriceShort } from "@/lib/orders/sla";
 
 export const metadata: Metadata = {
-  title: "Blue Rocket Agents: SEO reports in one business day",
-  description: "A full SEO audit of your website, $1,500 flat, delivered within one business day.",
+  title: `Blue Rocket Agents: SEO reports in ${SLA.deliveryHours} hours`,
+  description: `A full SEO audit of your website, ${formatPriceShort(SLA.priceCents)} flat, delivered within ${SLA.deliveryHours} hours.`,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

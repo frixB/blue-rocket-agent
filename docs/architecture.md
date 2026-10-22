@@ -111,7 +111,7 @@ blue-rocket/
 │  │  ├─ marketing-section.tsx  landing.tsx
 │  │  └─ status-poller.tsx
 │  └─ states/                            # one file per order state, see §6
-│     ├─ running.tsx      queued.tsx      weekend-queued.tsx
+│     ├─ running.tsx      queued.tsx
 │     ├─ blocked.tsx      partial.tsx     late.tsx
 │     ├─ escalated.tsx    failed.tsx      ready.tsx
 │     └─ index.tsx                        # the exhaustive switch
@@ -119,7 +119,7 @@ blue-rocket/
 ├─ lib/
 │  ├─ orders/
 │  │  ├─ status.ts                       # OrderStatus union + copy map
-│  │  ├─ sla.ts                          # business-day maths, single source
+│  │  ├─ sla.ts                          # delivery promise, single source
 │  │  └─ transitions.ts                  # legal state transitions
 │  ├─ stripe.ts
 │  ├─ mail/                              # every email mirrors a screen state
@@ -394,14 +394,13 @@ export const ORDER_STATUS = [
   "awaiting_payment",   // Stripe session open
   "payment_failed",     // S-03
   "queued",             // paid, worker not started
-  "weekend_queued",     // paid outside business hours — S-22
   "crawling",           // S-06
   "analysing",          // S-06
   "compiling",          // S-06
   "reviewing",          // S-06 — remove this member if there is no human review
   "blocked",            // S-08, customer action can fix it
   "late",               // S-11, past the promised delivery moment
-  "escalated",          // S-12, past 2 business days
+  "escalated",          // S-12, a day past the promise
   "partial",            // S-09
   "ready",              // S-13
   "failed",             // S-10
@@ -411,7 +410,7 @@ export const ORDER_STATUS = [
 export type OrderStatus = (typeof ORDER_STATUS)[number];
 
 export const IN_FLIGHT: OrderStatus[] =
-  ["queued","weekend_queued","crawling","analysing","compiling","reviewing","late"];
+  ["queued","crawling","analysing","compiling","reviewing","late"];
 
 export const NEEDS_CUSTOMER: OrderStatus[] = ["payment_failed","blocked"];
 
@@ -429,7 +428,6 @@ export function OrderState({ order }: { order: Order }) {
     case "analysing":
     case "compiling":
     case "reviewing":   return <Running order={order} />;
-    case "weekend_queued": return <WeekendQueued order={order} />;
     case "late":        return <Late order={order} />;
     case "blocked":     return <Blocked order={order} />;
     case "partial":     return <Partial order={order} />;
@@ -457,35 +455,28 @@ Every state component is required to render three things. This is a review check
 
 ## 7. The SLA module
 
-One report, $1,500, delivered within **one business day**, where a business day is Monday to Friday. This rule appears on the landing page, in the form, on the status page, in three emails, and in two background timers. It is defined once.
+One report, $1,500, delivered within **48 hours of payment, any day of the week**. Reports run every day, weekends included, and a person reviews every report before it goes out (decided 22 Oct 2026, see `docs/report-v2-spec.md` §10). This rule appears on the landing page, in the form, on the status page, in the admin panel, in three emails, and in two background timers. It is defined once.
 
 ```ts
 // lib/orders/sla.ts
 export const SLA = {
   productName: "Detailed SEO Report",
-  priceUsd: 1500,
-  businessDays: 1,          // delivery window
-  workStartHour: 9,
-  workEndHour: 17,
-  workDays: [1, 2, 3, 4, 5],  // Mon–Fri
-  lateAfterBusinessDays: 1,   // -> "late"
-  escalateAfterBusinessDays: 2, // -> "escalated" + auto-refund
-  timezone: "America/New_York", // the business's clock, not the customer's
+  priceCents: 150_000,
+  deliveryHours: 48,        // the promise, wall clock from payment
+  escalateAfterHours: 24,   // past the promise -> "escalated" + auto-refund
+  timezone: "America/New_York", // for formatting dates, not for working hours
 } as const;
 
-/** The promised delivery moment for an order paid at `paidAt`. */
-export function deliveryDeadline(paidAt: Date): Date { /* … */ }
-
-/** True when the order was paid outside working hours and will not start today. */
-export function isWeekendQueued(paidAt: Date): boolean { /* … */ }
-
-/** Business-hours elapsed, NOT wall clock. Used by the watchdog. */
-export function businessHoursSince(from: Date, to = new Date()): number { /* … */ }
+export function deliveryDeadline(paidAt: Date): Date { /* paidAt + 48h */ }
+export function escalationAt(paidAt: Date): Date { /* deadline + 24h */ }
+export function slaState(paidAt: Date, now?: Date): "on_track" | "late" | "escalate" { /* … */ }
 ```
 
-**The bug this module exists to prevent:** a wall-clock 48-hour escalation timer fires on Sunday morning and auto-refunds a perfectly healthy job that was paid for on Friday evening. Every timer in `workers/sla-watchdog.ts` uses `businessHoursSince`, never `Date.now() - paidAt`.
+`lib/admin/clock.ts` reads the same numbers, so the admin "time left" badges and the customer's delivery chip can never disagree.
 
-**The rendering rule:** never show a raw hour count on a weekend order. "In 66 hours" is technically accurate and reads as an insult at this price. `<DeliveryPromise>` renders a date and time, and only switches to a countdown once inside the final working day.
+**Every timer is wall clock.** There are no working hours, no weekend queue and no holiday calendar, so `Date.now() - paidAt` is correct. The earlier business-day maths (and the `weekend_queued` status, S-22) were removed when the promise changed.
+
+**The rendering rule:** never show a raw hour count to a customer. "In 41 hours" reads as an insult at this price. `<DeliveryPromise>` renders a day and time ("by 6:00pm Sunday 20 Sep").
 
 ---
 
@@ -591,12 +582,11 @@ Each pipeline stage is a separate job so a failure is attributable to a stage, w
 
 ### 8.4 Email
 
-Every email mirrors a screen state and links to it. The email is a pointer, never the delivery mechanism. On a one-business-day window the customer is away from the machine when the report lands, so these matter more than they would on a two-hour promise.
+Every email mirrors a screen state and links to it. The email is a pointer, never the delivery mechanism. On a 48-hour window the customer is away from the machine when the report lands, so these matter more than they would on a two-hour promise.
 
 | Trigger | Mirrors | Contains |
 |---|---|---|
 | Payment succeeded | S-06 | Order page link, delivery moment, reference |
-| Monday start (weekend orders) | S-22 → running | "Your report just started, landing by 5pm today" |
 | Crawler blocked | S-08 | The fix, forwardable to whoever manages the site |
 | Deadline missed | S-11 | New estimate, refund status if the guarantee ships |
 | Report ready | S-13 | Three headline numbers, link, PDF attached |
@@ -715,9 +705,9 @@ These block specific files and should be answered before the phase that needs th
 | 4 | Bank transfer fallback for declined cards? | S-03, highest-value recovery path |
 | 5 | Report retention period, and what happens after it | S-14 stale state, data policy |
 | 6 | Does the FigJam research contradict anything here? | everything, research wins |
-| 7 | The Figma landing page says reports "run every day, including weekends". The SLA and S-22 say Monday to Friday. The code follows the SLA. Which is right? | landing FAQ and chips, `SLA.workDays` |
+| 7 | ~~The Figma landing page says reports "run every day, including weekends". The SLA and S-22 say Monday to Friday.~~ Resolved 22 Oct 2026: every day, within 48 hours. S-22 removed. | landing FAQ and chips, `SLA.deliveryHours` |
 | 8 | Form Step 1 in Figma draws inputs with a hairline border and 6px radius; the `input/*` tokens say `border/strong` and 10px. The code follows the tokens (strong also meets the 3:1 contrast rule for form borders). Update the frame, or change the token? | `Input`, `Select` |
 | 9 | Figma's landing page has a newsletter "Subscribe" field and a "Notify me" waitlist. There is no mailing-list backend yet, so the code links to email instead. Which provider? | footer, pricing card |
 | 10 | The unnumbered `Space` and `Radius` collections in Figma duplicate `3. Scale`. Delete them? | token build warnings |
 | 11 | The `focus/ring` effect is amber `rgba(245,165,36,.45)` from the old brand; everything else focus-related is blue. Change it to blue in Figma? | every focusable element |
-| 12 | S-22 in Figma says "reports run every day, including weekends" while its frame is titled "paid Friday, runs Monday". The code follows the SLA (Monday to Friday). Confirm, then fix the frame. | S-22, landing FAQ |
+| 12 | ~~S-22 in Figma: "runs every day" vs "paid Friday, runs Monday".~~ Resolved 22 Oct 2026: reports run every day; S-22 is retired. Archive the frame in Figma. | S-22 |

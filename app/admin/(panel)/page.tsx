@@ -10,7 +10,7 @@ import { needsAttention } from "@/lib/admin/attention";
 import { clockState, formatRelative } from "@/lib/admin/clock";
 import { listDailyStats, listLeads, listOrders } from "@/lib/admin/data";
 import { currentAdmin, isOwner } from "@/lib/admin/session";
-import { formatPriceShort } from "@/lib/orders/sla";
+import { SLA, formatPriceShort } from "@/lib/orders/sla";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +31,7 @@ export default async function AdminOverview() {
   const newLeads = leads.filter((l) => l.hoursAgo < 24);
 
   return (
-    <AdminPage title="Overview" intro="Every order has 24 hours from payment, any day.">
+    <AdminPage title="Overview" intro={`Every order has ${SLA.deliveryHours} hours from payment, any day.`}>
       <GlanceStrip label="Today at a glance" items={[
         { label: "On the clock", value: String(running.length) },
         { label: "Under 4h left", value: String(urgent), tone: urgent ? "warning" : "neutral" },

@@ -12,7 +12,7 @@ export function Late({ order }: StateProps) {
     <StatusLayout
       order={order}
       tile={{ icon: Clock, tone: "warning" }}
-      heading="We're past the day we promised"
+      heading="We're past the time we promised"
       body={body}
       chips={<><Chip tone="warning" icon={Timer}>Running over</Chip><Chip icon={CircleDot}>Still running, no action needed</Chip></>}
     >

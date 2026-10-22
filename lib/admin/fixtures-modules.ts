@@ -1,3 +1,4 @@
+import { SLA } from "@/lib/orders/sla";
 import type { Role } from "./types";
 
 /**
@@ -97,7 +98,7 @@ export const CONTACTS: Contact[] = [
 
 export type ReportType = { key: string; name: string; state: "live" | "coming_soon"; priceCents?: number; promise?: string; blurb: string; sample?: string };
 export const REPORT_TYPES: ReportType[] = [
-  { key: "seo", name: "Detailed SEO Report", state: "live", priceCents: 150_000, promise: "Within 24 hours", sample: "/share/demo-share",
+  { key: "seo", name: "Detailed SEO Report", state: "live", priceCents: 150_000, promise: `Within ${SLA.deliveryHours} hours`, sample: "/share/demo-share",
     blurb: "Technical, on-page, backlinks and competitors, with what to fix first." },
   { key: "local", name: "Local SEO", state: "coming_soon", blurb: "Google Business Profile, local rankings, reviews and citations." },
   { key: "ads", name: "Google Ads audit", state: "coming_soon", blurb: "Wasted spend, keyword gaps, ad copy and landing pages." },
@@ -151,7 +152,7 @@ export const integrations = (): Integration[] => [
 
 export const ALERT_RULES = [
   { key: "urgent", label: "An order has under 4 hours left", owners: true, ops: true },
-  { key: "late", label: "An order misses the 24-hour deadline", owners: true, ops: true },
+  { key: "late", label: `An order misses the ${SLA.deliveryHours}-hour deadline`, owners: true, ops: true },
   { key: "escalated", label: "An order escalates and the auto-refund starts", owners: true, ops: true },
   { key: "refund", label: "A refund is waiting for approval", owners: true, ops: false },
   { key: "dispute", label: "A customer opens a dispute in Stripe", owners: true, ops: false },

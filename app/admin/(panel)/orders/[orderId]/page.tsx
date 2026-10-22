@@ -7,7 +7,7 @@ import { AdminPage } from "@/components/blocks/admin/admin-page";
 import { AdminStatusChip, ClockBadge, FlagChips } from "@/components/blocks/admin/badges";
 import { ClientContext } from "@/components/blocks/admin/client-context";
 import { RefundDecision } from "@/components/blocks/admin/refund-decision";
-import { deadlineAt, escalatesAt, formatRelative } from "@/lib/admin/clock";
+import { CLOCK, deadlineAt, escalatesAt, formatRelative } from "@/lib/admin/clock";
 import { getOrder, listRefundRequests, listStripeMismatches } from "@/lib/admin/data";
 import { currentAdmin, isOwner } from "@/lib/admin/session";
 import type { AdminOrder, EmailKind, EmailRecord, RefundRequest } from "@/lib/admin/types";
@@ -52,7 +52,7 @@ function Actions({ order, owner, pendingRefund, now }: { order: AdminOrder; owne
           done={`only this stage runs again and the order moves back to ${failedStage.stage === "crawl" ? "crawling" : "analysing"}.`} />
       )}
       {s === "late" && <AdminAction label="Push to review" icon={<Icon icon={PenLine} size="sm" />} done="the draft goes to the top of the review queue as it is." />}
-      {s === "failed" && <AdminAction label="Re-queue from the start" icon={<Icon icon={RotateCcw} size="sm" />} confirm="Run the whole report again from the crawl?" done="the order moves to queued and starts over. The 24-hour clock does not reset." />}
+      {s === "failed" && <AdminAction label="Re-queue from the start" icon={<Icon icon={RotateCcw} size="sm" />} confirm="Run the whole report again from the crawl?" done="the order moves to queued and starts over. The delivery clock does not reset." />}
       {s === "payment_failed" && <AdminAction label="Send payment link" icon={<Icon icon={CreditCard} size="sm" />} variant="primary" confirm={`Email ${order.email} a new payment link?`} done="they get a fresh Stripe link, with reminders at 1 hour and 24 hours." />}
       {s === "blocked" && <AdminAction label="Resend the fix instructions" icon={<Icon icon={Mail} size="sm" />} confirm={`Email ${order.email} the fix instructions again?`} done="they get the crawler-blocked email again, ready to forward to whoever manages the site." />}
       {(s === "ready" || s === "partial") && <AdminAction label="Resend ready email" icon={<Icon icon={Mail} size="sm" />} confirm={`Resend the ready email to ${order.email}?`} done="the ready email goes out again with the report link and the PDF." />}
@@ -112,7 +112,7 @@ export default async function OrderDetail({ params }: { params: Promise<{ orderI
             </Note>
           )}
           {order.status === "escalated" && (
-            <Note tone="danger">Escalated {formatRelative(escalatesAt(order.paidAt), now)}, 48 hours after payment. The {formatPriceShort(order.amountCents)} auto-refund runs on the next watchdog pass unless an owner stops it.</Note>
+            <Note tone="danger">Escalated {formatRelative(escalatesAt(order.paidAt), now)}, {CLOCK.escalateHours} hours after payment. The {formatPriceShort(order.amountCents)} auto-refund runs on the next watchdog pass unless an owner stops it.</Note>
           )}
           {order.refund && (
             <Note tone="info">Refunded {formatPriceShort(order.amountCents)} on {day(order.refund.issuedAt)} · {order.refund.reason} · {order.refund.automatic ? "automatic" : "by an owner"} · {order.refund.reference}</Note>

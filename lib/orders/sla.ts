@@ -2,102 +2,44 @@ import { TZDate } from "@date-fns/tz";
 import { format, differenceInCalendarDays } from "date-fns";
 
 /**
- * The delivery promise. One source of truth for price, window and working
- * hours. Landing page, form, status page, emails and the watchdog all read
- * from here. Change it once.
+ * The delivery promise. One source of truth for price, window and escalation.
+ * Landing page, form, status page, emails, the admin clock and the watchdog
+ * all read from here. Change it once.
+ *
+ * Reports run every day, weekends included, so every timer is wall-clock
+ * time from payment. There are no working hours and no weekend queue.
  */
 export const SLA = {
   productName: "Detailed SEO Report",
   priceCents: 150_000,
-  /** Delivery window, in business days. */
-  businessDays: 1,
-  /** Working hours, local to SLA.timezone. */
-  workStartHour: 9,
-  workEndHour: 17,
-  /** 0 = Sunday. Monday to Friday. */
-  workDays: [1, 2, 3, 4, 5] as readonly number[],
-  /** Business days past the promise before we escalate and auto-refund. */
-  escalateAfterBusinessDays: 1,
-  /** The business's clock, not the customer's. Open decision, see docs. */
+  /** Delivery window: within this many hours of payment, any day. */
+  deliveryHours: 48,
+  /** Hours past the promise before we escalate and auto-refund. */
+  escalateAfterHours: 24,
+  /** The business's clock, not the customer's. Used to format dates. */
   timezone: "America/New_York",
 } as const;
 
-const DAY_MINUTES = (SLA.workEndHour - SLA.workStartHour) * 60;
+const HOUR = 3_600_000;
 const MIN = 60_000;
 
 const zoned = (d: Date | number) => new TZDate(typeof d === "number" ? d : d.getTime(), SLA.timezone);
-const at = (z: TZDate, dayOffset: number, hour: number) =>
-  new TZDate(z.getFullYear(), z.getMonth(), z.getDate() + dayOffset, hour, 0, 0, 0, SLA.timezone);
-const isWorkday = (z: TZDate) => SLA.workDays.includes(z.getDay());
-
-/** Moves forward `minutes` of working time, skipping nights and weekends. */
-export function addBusinessMinutes(from: Date, minutes: number): Date {
-  let cursor = zoned(from);
-  let remaining = minutes;
-  for (let guard = 0; guard < 1000; guard++) {
-    const start = at(cursor, 0, SLA.workStartHour);
-    const end = at(cursor, 0, SLA.workEndHour);
-    if (!isWorkday(cursor) || cursor.getTime() >= end.getTime()) {
-      cursor = at(cursor, 1, SLA.workStartHour);
-      continue;
-    }
-    if (cursor.getTime() < start.getTime()) cursor = start;
-    const available = (end.getTime() - cursor.getTime()) / MIN;
-    if (remaining <= available) return new Date(cursor.getTime() + remaining * MIN);
-    remaining -= available;
-    cursor = at(cursor, 1, SLA.workStartHour);
-  }
-  throw new Error("addBusinessMinutes did not converge");
-}
-
-/** Working minutes between two instants. Never wall clock. */
-export function businessMinutesBetween(from: Date, to: Date): number {
-  if (to.getTime() <= from.getTime()) return 0;
-  let cursor = zoned(from);
-  let total = 0;
-  for (let guard = 0; guard < 5000; guard++) {
-    if (cursor.getTime() >= to.getTime()) break;
-    const start = at(cursor, 0, SLA.workStartHour);
-    const end = at(cursor, 0, SLA.workEndHour);
-    if (isWorkday(cursor)) {
-      const a = Math.max(cursor.getTime(), start.getTime());
-      const b = Math.min(end.getTime(), to.getTime());
-      if (b > a) total += (b - a) / MIN;
-    }
-    cursor = at(cursor, 1, SLA.workStartHour);
-  }
-  return Math.round(total);
-}
 
 /** The promised delivery moment for an order paid at `paidAt`. */
 export function deliveryDeadline(paidAt: Date): Date {
-  return addBusinessMinutes(paidAt, SLA.businessDays * DAY_MINUTES);
+  return new Date(paidAt.getTime() + SLA.deliveryHours * HOUR);
 }
 
-/** When work actually begins. Equal to paidAt inside working hours. */
-export function workStartsAt(paidAt: Date): Date {
-  return addBusinessMinutes(paidAt, 0);
-}
-
-export type QueueReason = "now" | "overnight" | "weekend";
-
-/** Why an order is not running yet. Drives the S-22 weekend queue state. */
-export function queueReason(paidAt: Date): QueueReason {
-  const start = workStartsAt(paidAt);
-  if (start.getTime() === paidAt.getTime()) return "now";
-  const paid = zoned(paidAt);
-  const days = differenceInCalendarDays(zoned(start), paid);
-  return !isWorkday(paid) || days > 1 ? "weekend" : "overnight";
+/** When the order escalates and the auto-refund starts. */
+export function escalationAt(paidAt: Date): Date {
+  return new Date(deliveryDeadline(paidAt).getTime() + SLA.escalateAfterHours * HOUR);
 }
 
 export type SlaState = "on_track" | "late" | "escalate";
 
-/** Business-hours aware. A Friday evening order is not late on Sunday. */
 export function slaState(paidAt: Date, now: Date = new Date()): SlaState {
-  const deadline = deliveryDeadline(paidAt);
-  if (now.getTime() <= deadline.getTime()) return "on_track";
-  const over = businessMinutesBetween(deadline, now);
-  return over >= SLA.escalateAfterBusinessDays * DAY_MINUTES ? "escalate" : "late";
+  if (now.getTime() <= deliveryDeadline(paidAt).getTime()) return "on_track";
+  return now.getTime() < escalationAt(paidAt).getTime() ? "late" : "escalate";
 }
 
 /**

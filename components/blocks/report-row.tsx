@@ -26,7 +26,6 @@ export function summarise(order: Order): Row {
     case "refunded":
       return { kind: "refunded", tone: "info", icon: FileText, meta: `Refunded ${day(order.refund?.issuedAt ?? order.paidAt)}` };
     case "queued":
-    case "weekend_queued":
       return { kind: "queued", tone: "neutral", icon: ChartColumn, meta: `Delivered ${promise}` };
     default:
       return { kind: "running", tone: "warning", icon: ChartColumn, meta: `Delivered ${promise}` };

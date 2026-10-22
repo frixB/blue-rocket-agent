@@ -1,6 +1,5 @@
 import type { Order } from "@/lib/orders/types";
 import { Running } from "./running";
-import { WeekendQueued } from "./weekend-queued";
 import { Late } from "./late";
 import { Blocked } from "./blocked";
 import { Failed } from "./failed";
@@ -21,8 +20,6 @@ export function OrderState({ order }: { order: Order }) {
     case "compiling":
     case "reviewing":
       return <Running order={order} />;
-    case "weekend_queued":
-      return <WeekendQueued order={order} />;
     case "late":
       return <Late order={order} />;
     case "blocked":

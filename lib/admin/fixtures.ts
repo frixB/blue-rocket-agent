@@ -1,5 +1,6 @@
 import { STAGES, type StageState } from "@/lib/orders/status";
 import type { StageRecord } from "@/lib/orders/types";
+import { CLOCK } from "./clock";
 import type { AdminOrder, AdminStatus, DraftSection, EmailRecord, Flag, Intake, RefundRequest, Review, StripeMismatch } from "./types";
 
 /**
@@ -9,6 +10,10 @@ import type { AdminOrder, AdminStatus, DraftSection, EmailRecord, Flag, Intake, 
  */
 
 const HOUR = 3_600_000;
+/** Seeds are written against the promise, so they keep their meaning if it changes. */
+const D = CLOCK.deadlineHours;
+const E = CLOCK.escalateHours;
+const AUTO_SENT = D - CLOCK.autoSendBeforeHours;
 
 type Seed = {
   id: string;
@@ -110,7 +115,7 @@ function emailsFor(seed: Seed, paid: number): EmailRecord[] {
   if (seed.status === "awaiting_payment" || seed.status === "payment_failed") return [];
   const out: EmailRecord[] = [{ kind: "payment_succeeded", at: iso(0), to, state: "opened" }];
   if (seed.status === "blocked") out.push({ kind: "crawler_blocked", at: iso(0.4), to, state: "delivered" });
-  if (seed.status === "late" || seed.status === "escalated") out.push({ kind: "deadline_missed", at: iso(24), to, state: "opened" });
+  if (seed.status === "late" || seed.status === "escalated") out.push({ kind: "deadline_missed", at: iso(D), to, state: "opened" });
   if (seed.status === "failed") out.push({ kind: "failed", at: iso(seed.paidHoursAgo - 0.5), to, state: "delivered" });
   if (seed.deliveredAfter) out.push({ kind: "report_ready", at: iso(seed.deliveredAfter), to, state: seed.flags?.includes("pdf_failed") ? "bounced" : "opened" });
   if (seed.refund) out.push({ kind: "refund_issued", at: new Date(paid + (seed.paidHoursAgo - seed.refund.hoursAgo) * HOUR).toISOString(), to, state: "delivered" });
@@ -119,9 +124,9 @@ function emailsFor(seed: Seed, paid: number): EmailRecord[] {
 
 const SEEDS: Seed[] = [
   { id: "bra-4502", reference: "BRA-4502", status: "reviewing", businessName: "Harbor Dental Studio", websiteUrl: "https://harbordental.com",
-    customerName: "Priya Raman", email: "priya@harbordental.com", paidHoursAgo: 20.8 },
+    customerName: "Priya Raman", email: "priya@harbordental.com", paidHoursAgo: D - 3.2 },
   { id: "bra-4498", reference: "BRA-4498", status: "reviewing", businessName: "Greenleaf Landscaping", websiteUrl: "https://greenleafyards.com",
-    customerName: "Tom Alvarez", email: "tom@greenleafyards.com", paidHoursAgo: 21.7,
+    customerName: "Tom Alvarez", email: "tom@greenleafyards.com", paidHoursAgo: D - 2.3,
     intake: { industry: "Landscaping", city: "Denver", employees: "1 to 5", annualRevenue: "Under $250k" } },
   { id: "bra-4505", reference: "BRA-4505", status: "reviewing", businessName: "Oak & Iron Fitness", websiteUrl: "https://oakandiron.fit",
     customerName: "Dana Whitfield", email: "dana@oakandiron.fit", paidHoursAgo: 9.2, flags: ["continued_past_url_check"],
@@ -134,10 +139,10 @@ const SEEDS: Seed[] = [
     customerName: "Grace Kim", email: "grace@summitroofing.co", paidHoursAgo: 0.6, at: "crawl",
     intake: { industry: "Roofing", city: "Nashville" } },
   { id: "bra-4496", reference: "BRA-4496", status: "late", businessName: "Blue Harbor Law", websiteUrl: "https://blueharborlaw.com",
-    customerName: "Marcus Hale", email: "marcus@blueharborlaw.com", paidHoursAgo: 26.4, at: "compile",
+    customerName: "Marcus Hale", email: "marcus@blueharborlaw.com", paidHoursAgo: D + 2.4, at: "compile",
     intake: { industry: "Legal", city: "Boston", employees: "21 to 50", annualRevenue: "$1M to $5M" } },
   { id: "bra-4488", reference: "BRA-4488", status: "escalated", businessName: "Pinecrest Veterinary", websiteUrl: "https://pinecrestvet.com",
-    customerName: "Helen Moss", email: "helen@pinecrestvet.com", paidHoursAgo: 48.6, at: "analysis",
+    customerName: "Helen Moss", email: "helen@pinecrestvet.com", paidHoursAgo: E + 0.6, at: "analysis",
     failure: { stage: "SEO analysis", code: "LLM_TIMEOUT", message: "The analysis model timed out 3 times on the competitive section." },
     intake: { industry: "Veterinary", city: "Raleigh" }, assignee: "Nimali" },
   { id: "bra-4501", reference: "BRA-4501", status: "blocked", businessName: "Maple Street Bakery", websiteUrl: "https://maplestreetbakery.com",
@@ -149,7 +154,7 @@ const SEEDS: Seed[] = [
     failure: { stage: "SEO analysis", code: "EMPTY_CRAWL", message: "The crawl returned 2 pages. Every section came back empty." },
     intake: { industry: "Auto repair", city: "Tulsa" } },
   { id: "bra-4494", reference: "BRA-4494", status: "ready", businessName: "Lumen Photography", websiteUrl: "https://lumenphoto.studio",
-    customerName: "Ava Lindqvist", email: "ava@lumenphoto.studio", paidHoursAgo: 30.5, deliveredAfter: 22, flags: ["sent_unreviewed"],
+    customerName: "Ava Lindqvist", email: "ava@lumenphoto.studio", paidHoursAgo: D + 8.5, deliveredAfter: AUTO_SENT, flags: ["sent_unreviewed"],
     intake: { industry: "Photography", city: "Seattle", marketingConsent: true } },
   { id: "bra-4490", reference: "BRA-4490", status: "ready", businessName: "Northside Plumbing", websiteUrl: "https://northsideplumbing.com",
     customerName: "Eddie Burke", email: "eddie@northsideplumbing.com", paidHoursAgo: 34, deliveredAfter: 14.2, flags: ["pdf_failed"],
@@ -213,8 +218,8 @@ export function adminFixtures(now: Date): AdminOrder[] {
       },
       assignee: seed.assignee,
       audit: [
-        { at: new Date(paid).toISOString(), who: "Stripe webhook", action: "Marked paid, deadline set to 24 hours" },
-        ...(seed.flags?.includes("sent_unreviewed") ? [{ at: new Date(paid + 22 * HOUR).toISOString(), who: "System", action: "Auto-sent 2h before the deadline, flagged Sent unreviewed" }] : []),
+        { at: new Date(paid).toISOString(), who: "Stripe webhook", action: `Marked paid, deadline set to ${D} hours` },
+        ...(seed.flags?.includes("sent_unreviewed") ? [{ at: new Date(paid + AUTO_SENT * HOUR).toISOString(), who: "System", action: `Auto-sent ${CLOCK.autoSendBeforeHours}h before the deadline, flagged Sent unreviewed` }] : []),
         ...(review?.approvedAt ? [{ at: review.approvedAt, who: review.reviewer ?? "Nimali", action: "Approved the report" }] : []),
       ],
     };
@@ -256,7 +261,7 @@ export const LEADS: Lead[] = [
 export type DailyStat = {
   /** Local midnight of the day, ISO. */
   day: string;
-  /** Reports delivered that day, and how many of those went out after the 24-hour deadline. */
+  /** Reports delivered that day, and how many of those went out after the deadline. */
   delivered: number;
   late: number;
   /** Money in, before Stripe fees, and money refunded that day. */
